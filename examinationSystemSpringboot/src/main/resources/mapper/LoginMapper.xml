@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.LoginMapper">
+    <select id="loginCheck" resultType="int" parameterType="com.sake.examination_system.entity.DTO.LoginDTO">
+        SELECT * FROM user WHERE user_phone = #{userPhone} AND user_password = #{userPassword};
+    </select>
+
+    <select id="getRole" resultType="int" parameterType="java.lang.String">
+        SELECT user_role FROM user WHERE user_phone = #{userPhone}
+    </select>
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.PaperClassMapper">
+
+    <insert id="addOne">
+        INSERT INTO paper_class(paper_id,class_id) VALUES(#{paperId},#{classId})
+    </insert>
+
+    <select id="getListByTeacherId" resultType="java.util.HashMap">
+         SELECT
+            c.class_name AS className,
+            COUNT(*) AS paperCounts
+        FROM
+            paper_class pc
+        JOIN
+            paper p ON pc.paper_id = p.paper_id
+        JOIN
+            class c ON pc.class_id = c.class_id
+        WHERE
+            p.teacher_id = #{teacherId}
+        GROUP BY
+            c.class_id;
+    </select>
+    <select id="getClassIds" resultType="java.lang.Integer">
+        SELECT class_id FROM  paper_class
+        WHERE paper_id = #{paperId}
+    </select>
+</mapper>

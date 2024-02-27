@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.PaperMapper">
+    <insert id="releasePaper" useGeneratedKeys="true" keyProperty="paperId">
+        INSERT INTO paper (paper_name, paper_total_time, paper_content, paper_score,is_allow_check,teacher_id)
+        VALUES (#{paperName},  #{paperTotalTime}, #{paperContent, typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler}, #{paperScore}, #{isAllowCheck},#{teacherId})
+    </insert>
+
+    <delete id="deletePaperById">
+        DELETE FROM paper WHERE paper_id = #{id}
+    </delete>
+
+    <select id="getAllPaperListByTeacherId" resultType="com.sake.examination_system.entity.Paper">
+        SELECT * FROM paper
+        WHERE teacher_id = #{id}
+        <if test="name != null and name != ''">
+            AND paper_name LIKE  CONCAT('%', #{name}, '%')
+        </if>
+        LIMIT #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="getAllPaperListByTeacherIdTotal" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM paper
+        WHERE teacher_id = #{id}
+        <if test="name != null and name != ''">
+            AND paper_name LIKE  CONCAT('%', #{name}, '%')
+        </if>
+    </select>
+
+    <select id="getAllPaper" resultType="com.sake.examination_system.entity.Paper">
+        SELECT * FROM paper
+    </select>
+
+    <select id="getAllPaperByPage" resultType="com.sake.examination_system.entity.Paper">
+        SELECT * FROM paper
+        WHERE paper_id IN
+        <foreach collection="paperList" item="paperId" open="(" separator="," close=")">
+            #{paperId}
+        </foreach>
+        LIMIT #{pageDTO.pageNum}, #{pageDTO.pageSize}
+    </select>
+
+    <select id="getPaperById" resultType="com.sake.examination_system.entity.Paper">
+        SELECT * FROM paper
+        WHERE paper_id IN
+        <foreach collection="paperIdList" item="paperId" open="(" separator="," close=")">
+            #{paperId}
+        </foreach>
+    </select>
+
+    <select id="getPaperCountByTeacherId" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM paper
+        WHERE teacher_id = #{teacherId}
+    </select>
+
+</mapper>

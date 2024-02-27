@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.StudentPaperMapper">
+
+    <insert id="addPaper">
+        INSERT INTO student_paper(student_id,paper_id)
+        VALUES(#{studentId},#{paperId})
+    </insert>
+
+    <update id="isFinishPaper">
+        UPDATE student_paper
+        SET is_finish = 1
+        WHERE paper_id = #{paperId} AND student_id = #{studentId}
+    </update>
+
+    <update id="submitCorrect">
+        UPDATE student_paper
+        SET
+            is_correct = 1,
+            scores = #{totalScore}
+        WHERE
+            student_id = #{studentId} AND
+            paper_id = #{paperId};
+    </update>
+
+    <select id="getPaperIdByStudent" resultType="java.lang.Integer">
+        SELECT paper_id FROM student_paper
+        WHERE student_id = #{id} AND is_finish = #{isFinish}
+        <if test="isCorrect != null">
+            AND is_correct = #{isCorrect}
+        </if>
+    </select>
+
+    <select id="getPaperIdByStudentTotal" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM student_paper
+        WHERE student_id = #{id} AND is_finish = #{isFinish}
+        <if test="isCorrect != null">
+            AND is_correct = #{isCorrect}
+        </if>
+    </select>
+
+    <select id="getCorrectPaper" parameterType="map" resultType="com.sake.examination_system.entity.DTO.PaperWithStudentDTO">
+        SELECT p.*, s.student_id, s.student_number, u.user_realName, c.class_name
+        FROM paper p
+        JOIN student_paper sp ON p.paper_id = sp.paper_id
+        JOIN student s ON sp.student_id = s.student_id
+        JOIN user u ON u.user_id = s.user_id
+        LEFT JOIN class c ON s.class_id = c.class_id
+        WHERE p.teacher_id = #{pageDTO.id}
+        AND sp.is_finish = #{isFinish}
+        AND sp.is_correct = #{isCorrect}
+        <if test="pageDTO.studentName != null and pageDTO.studentName != ''">
+            AND u.user_realName LIKE CONCAT('%', #{pageDTO.studentName}, '%')
+        </if>
+        <if test="pageDTO.paperName != null and pageDTO.paperName != ''">
+            AND p.paper_name LIKE CONCAT('%', #{pageDTO.paperName}, '%')
+        </if>
+        <if test="pageDTO.className != null and pageDTO.className != ''">
+            AND c.class_name LIKE CONCAT('%', #{pageDTO.className}, '%')
+        </if>
+        ORDER BY sp.paper_id
+        LIMIT #{pageDTO.pageNum}, #{pageDTO.pageSize}
+    </select>
+
+
+    <select id="getCorrectPaperTotal" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM paper p
+        JOIN student_paper sp ON p.paper_id = sp.paper_id
+        JOIN student s ON sp.student_id = s.student_id
+        JOIN user u ON u.user_id = s.user_id
+        LEFT JOIN class c ON s.class_id = c.class_id
+        WHERE p.teacher_id = #{pageDTO.id}
+        AND sp.is_finish = #{isFinish}
+        AND sp.is_correct = #{isCorrect}
+        <if test="pageDTO.studentName != null and pageDTO.studentName != ''">
+            AND u.user_realName LIKE CONCAT('%', #{pageDTO.studentName}, '%')
+        </if>
+        <if test="pageDTO.paperName != null and pageDTO.paperName != ''">
+            AND p.paper_name LIKE CONCAT('%', #{pageDTO.paperName}, '%')
+        </if>
+        <if test="pageDTO.className != null and pageDTO.className != ''">
+            AND c.class_name LIKE CONCAT('%', #{pageDTO.className}, '%')
+        </if>
+    </select>
+
+    <select id="getExamRecordsByPidAndSid" resultType="com.sake.examination_system.entity.StudentPaper">
+        SELECT * FROM student_paper
+        WHERE paper_id = #{paperId} AND student_id = #{studentId}
+    </select>
+
+    <select id="getCountsStudentPaper" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM student_paper
+        WHERE student_id = #{id} AND is_finish = #{isFinish} AND is_correct = #{isCorrect}
+    </select>
+
+    <select id="getPaperIsFinish" resultType="java.lang.Boolean">
+        SELECT is_finish FROM student_paper
+         WHERE student_id = #{studentId} AND paper_id = #{paperId}
+    </select>
+
+</mapper>

@@ -1,0 +1,13 @@
+.custom-submenu .el-submenu__icon-arrow {
+    display: none;
+  }
+
+  .student-submenu .el-submenu__icon-arrow {
+    display: none;
+  }
+
+  .score-submenu .el-submenu__icon-arrow {
+    display: none;
+  
+  }
+  

@@ -1,0 +1,72 @@
+.centered-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    /* 确保宽度占满 el-header */
+}
+
+.head-right {
+    display: flex;
+    justify-content: flex-start;
+    /* 修改这里 */
+    align-items: center;
+    justify-content: flex-end;
+    width: 80%;
+    /* 确保宽度占满 el-header */
+}
+
+.header-left {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 20%;
+}
+
+.el-menu-item {
+    font-size: 15px !important;
+    line-height: 62px !important;
+    font-family: 'Microsoft YaHei', '微软雅黑', sans-serif;
+    border-bottom: none;
+}
+
+.el-menu {
+    border-bottom: none !important;
+}
+
+.el-menu--horizontal>.el-menu-item {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin: 0;
+    border-bottom: 2px solid transparent;
+    color: #303133
+}
+
+.el-menu-item:hover {
+    color: #a0cfff;
+    background-color: rgb(231, 235, 240) !important;
+    border-bottom: none !important;
+}
+
+.el-menu-item.is-active {
+    background-color: rgb(231, 235, 240) !important;
+    font-family: 'Microsoft YaHei', '微软雅黑', sans-serif;
+}
+
+.custom-dropdown-menu {
+    min-width: 100px;
+    /* 设置下拉菜单的最小宽度 */
+    display: block;
+    flex-direction: column;
+    align-items: center;
+    /* 垂直居中 */
+    text-align: center;
+}
+
+.custom-dropdown-menu .el-dropdown-item {
+    font-size: 10em;
+    /* 调整下拉菜单项的字体大小 */
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.FileMapper">
+    <insert id="addFile" parameterType="com.sake.examination_system.entity.myFile" useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO file(file_name,file_type,file_size,file_url,file_md5,file_is_delete,file_enable) VALUES(#{fileName},#{fileType},#{fileSize},#{fileUrl},#{fileMd5},#{fileIsDelete},#{fileEnable})
+    </insert>
+
+    <select id="getFileByMd5" parameterType="java.lang.String" resultType="com.sake.examination_system.entity.myFile">
+        SELECT * FROM file WHERE file_md5 = #{md5} LIMIT 1
+    </select>
+
+    <select id="getFileById" resultType="com.sake.examination_system.entity.myFile">
+        SELECT * FROM file WHERE file_id = #{id}
+    </select>
+
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.TitleMapper">
+
+    <insert id="createTitle" parameterType="map" >
+        INSERT INTO title (title_type, title_content, teacher_id) VALUES (#{titleType}, #{titleContent}, #{teacherId});
+    </insert>
+
+    <delete id="deleteTitleById">
+        DELETE FROM title WHERE title_id = #{id}
+    </delete>
+
+    <select id="getAllTitlesByTeacherId" resultType="java.util.Map" parameterType="com.sake.examination_system.entity.DTO.PageDTO">
+        SELECT * FROM title
+        WHERE teacher_id = #{id}
+        <if test="name != null and name != ''">
+            AND JSON_EXTRACT(title_content, '$.name') LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="titleType != -1">
+            AND title_type = #{titleType}
+        </if>
+        LIMIT #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="getTitlesCountByTeacherId" resultType="java.lang.Integer" parameterType="com.sake.examination_system.entity.DTO.PageDTO">
+        SELECT COUNT(*) FROM title
+        WHERE teacher_id = #{id}
+        <if test="name != null and name != ''">
+            AND JSON_EXTRACT(title_content, '$.name') LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="titleType != -1 and titleType != null">
+            AND title_type = #{titleType}
+        </if>
+    </select>
+    <select id="getTitleById" resultType="java.util.Map">
+        SELECT * FROM title
+        WHERE title_id in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getAllTitleType" resultType="java.lang.Integer">
+        SELECT title_type FROM title
+    </select>
+
+</mapper>

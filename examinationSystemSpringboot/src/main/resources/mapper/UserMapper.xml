@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.UserMapper">
+    <update id="updateUserInfo">
+        UPDATE user
+        SET user_realName = #{userRealName},
+        user_name = #{userName},
+        user_gender = #{userGender},
+        user_age = #{userAge},
+        user_email = #{userEmail},
+        user_phone = #{userPhone}
+        <if test="userAvatarId != 0">,user_avatar_id = #{userAvatarId}</if>
+        WHERE user_id = #{userId};
+    </update>
+
+    <select id="getStudentsByUserRealNameTotal" resultType="int">
+        SELECT COUNT(*)
+        FROM student s
+        INNER JOIN user u ON s.user_id = u.user_id
+        WHERE u.user_realName LIKE CONCAT('%',#{userRealName},'%') AND class_id = #{classId}
+    </select>
+
+    <select id="checkPhoneIsExist" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM user
+        WHERE user_phone = #{userPhone}
+    </select>
+
+    <select id="getUserByPhone" resultType="com.sake.examination_system.entity.User">
+        SELECT * from user WHERE user_phone = #{userPhone}
+    </select>
+
+    <select id="getUserById" resultType="com.sake.examination_system.entity.User">
+        SELECT * FROM user WHERE user_id = #{userId}
+    </select>
+
+    <select id="getAvatarByUserId" resultType="java.lang.String">
+        SELECT file_url FROM file
+        WHERE file_id = (SELECT user_avatar_id FROM user WHERE user_id = #{userId})
+    </select>
+
+
+    <insert id="addUser" parameterType="com.sake.examination_system.entity.User" useGeneratedKeys="true" keyProperty="userId">
+        <!-- 插入用户信息 -->
+        INSERT INTO user (user_name, user_password, user_realName, user_role, user_avatar_id, user_age, user_email, user_phone)
+        VALUES (#{userName}, #{userPassword}, #{userRealName}, #{userRole}, #{userAvatarId},#{userAge}, #{userEmail}, #{userPhone})
+    </insert>
+    
+    <delete id="deleteUserById">
+        DELETE FROM user where user_id = #{userId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.ClassMapper">
+    <insert id="createClassByName">
+        INSERT INTO class(class_name,class_code,teacher_id) VALUES(#{className},#{classCode},#{id})
+    </insert>
+
+    <update id="addNumber">
+        UPDATE class
+        SET student_numbers = student_numbers + 1
+        WHERE class_id = #{classId}; -- 你可能需要一个 WHERE 子句来指定更新的条件
+
+    </update>
+
+    <delete id="removeClass">
+        DELETE FROM class WHERE class_id = #{classId}
+    </delete>
+
+    <select id="getClassIdByTeacherId" resultType="java.lang.Integer" parameterType="int">
+        SELECT class_id FROM class WHERE teacher_id = #{teacherID}
+    </select>
+
+    <select id="getPage" resultType="com.sake.examination_system.entity.Class">
+        SELECT *
+        FROM class c
+        WHERE c.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+        LIMIT #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="getAllClassTotalById" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM class c
+        WHERE c.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </select>
+
+    <select id="getClassByName" resultType="com.sake.examination_system.entity.Class">
+        SELECT *
+        FROM class c
+        WHERE c.class_name LIKE #{className} AND c.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+        LIMIT #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="checkClassName" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM class
+        WHERE class_name  = #{className}
+    </select>
+
+    <select id="getAllClassByTeacherId" resultType="com.sake.examination_system.entity.Class">
+        SELECT * FROM class
+        WHERE teacher_id = #{id}
+    </select>
+
+    <select id="getClassByIds" resultType="com.sake.examination_system.entity.Class">
+        SELECT *
+        FROM class c
+        WHERE c.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </select>
+
+    <select id="getClassByToken" resultType="com.sake.examination_system.entity.DTO.ClassWithT">
+        SELECT c.class_id, c.class_name, u.user_realName, u.user_phone
+        FROM student s
+        JOIN class c ON s.class_id = c.class_id
+        JOIN teacher t ON c.teacher_id = t.teacher_id
+        JOIN user u ON t.user_id = u.user_id
+        WHERE s.user_id = #{userId}
+    </select>
+
+    <select id="getClassById" resultType="com.sake.examination_system.entity.Class">
+        SELECT * FROM class
+        WHERE class_id = #{classId}
+    </select>
+
+</mapper>

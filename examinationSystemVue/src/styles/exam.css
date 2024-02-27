@@ -1,0 +1,176 @@
+.answer-style{
+  color: #ff0000;
+  margin-top: 30px;
+  margin-left: 30px;
+  font-size: 13px;
+}
+
+.student-answer{
+  color: #0040fe;
+  font-size: 15px;
+  margin-left: auto;
+}
+.section-title {
+  color: #333;
+  margin-top: 80px;
+  margin-bottom: 30px;
+  margin-left: 70px;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #e4e4e4;
+}
+.correctPaper-section-title{
+  color: #333;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  margin-left: 70px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.question-title {
+  font-size: 16px;
+  margin-bottom: 15px;
+}
+
+.exam-header {
+  position: fixed;
+  width: 100%;
+  /* 设置头部高度 */
+  background-color: #74879c;
+  color: #ffffff;
+  text-align: center;
+  z-index: 1000;
+  border-bottom-left-radius: 10px;
+  /* 左下角圆角 */
+  border-bottom-right-radius: 10px;
+  /* 右下角圆角 */
+  padding: 15px 0;
+  /* 增加上下内边距，使内容居中 */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  /* 将子元素分散排列 */
+  align-items: center;
+  /* 垂直居中 */
+  min-height: 60px;
+}
+
+.header-content {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.exam-header h2,
+.exam-header p {
+  margin: 0;
+  /* 移除标题和段落的默认边距 */
+}
+
+.exam-header p {
+  font-size: 14px;
+  /* 调整段落的字体大小 */
+}
+
+.timer-container {
+  flex-shrink: 0;
+  /* 不缩小 */
+  margin-right: 20px;
+  /* 右边距 */
+  /* 添加计时器样式，例如设置字体颜色、大小等 */
+}
+
+.custom-input-area {
+  min-width: 50px;
+  width: 80px;
+  max-width: 500px;
+}
+
+.main-with-header {
+  margin-top: 80px;
+  /* 与头部高度相等的 margin-top */
+  overflow-y: auto;
+  /* 或 overflow-y: scroll; */
+  padding: 20px;
+  /* 可根据需要调整 padding */
+}
+
+.exam-question {
+  margin: 50px;
+  margin-top: 0px;
+  margin-bottom: 10px;
+  padding: 15px;
+}
+
+
+.correctPaper-body {
+  padding-right: 15px;
+  max-height: 100vh; 
+  overflow: auto;
+  margin-left: 150px;
+  margin-right: 150px;
+  box-shadow: 0 2px 20px 20px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+}
+
+.correctPaper-body::-webkit-scrollbar {
+  width: 0em; /* 调整滚动条宽度 */
+}
+
+.correctPaper-title{
+  padding: 10px;
+}
+
+.custom-input {
+  display: inline-block;
+  width: auto;
+  margin-right: 15px;
+  margin-left: 0px;
+}
+
+.custom-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.custom-checkbox {
+  flex-basis: 50%;
+  margin-top: 10px;
+}
+
+.custom-radio-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-radio {
+  margin-bottom: 10px;
+}
+
+.inline-div {
+  display: inline;
+}
+
+.title-scores {
+  margin-left: 10px;
+}
+
+.exam-body {
+  background-color: #f3f3f3;
+  padding: 15px;
+  margin-left: 100px;
+  margin-right: 100px;
+}
+
+.submit-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.el-container.is-vertical{
+  height: 100vh;
+}
+

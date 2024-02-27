@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.StudentMapper">
+
+    <update id="removeStudentFromClass" parameterType="int">
+        UPDATE student
+        SET class_id = 0
+        WHERE student_id = #{studentId}
+    </update>
+
+    <update id="inviteStudentToClass">
+        UPDATE student
+        SET class_id = #{classId}
+        WHERE student_number = #{studentNumber}
+    </update>
+
+    <select id="getPage" resultMap="studentWithUserAndClassResultMap">
+        SELECT s.student_id, s.student_number, s.student_face_id,
+        u.user_id, u.user_name, u.user_realName, u.user_avatar_id, u.user_gender, u.user_email, u.user_phone,
+        c.class_id, c.class_name, c.teacher_id
+        FROM student s
+        INNER JOIN user u ON s.user_id = u.user_id
+        LEFT JOIN class c ON s.class_id = c.class_id
+        WHERE s.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+        LIMIT #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="getStudentsByUserRealName" resultMap="studentWithUserAndClassResultMap">
+        SELECT s.student_id, s.student_number, s.student_face_id,
+        u.user_id, u.user_name, u.user_realName, u.user_avatar_id, u.user_gender, u.user_email, u.user_phone,
+        c.class_id, c.class_name, c.teacher_id
+        FROM student s
+        INNER JOIN user u ON s.user_id = u.user_id
+        LEFT JOIN class c ON s.class_id = c.class_id
+        WHERE u.user_realName LIKE #{userRealName} AND s.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+        LIMIT #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="getStudentIdByPhone" parameterType="java.lang.String" resultType="int">
+        SELECT student_id
+        from student
+        WHERE user_id = (SELECT user_id FROM user WHERE user_phone = #{userPhone})
+    </select>
+
+
+    <delete id="delStudentByUid">
+        DELETE FROM student WHERE user_id = #{userId}
+    </delete>
+
+    <!-- 查询学生信息及其关联的用户信息 -->
+    <select id="getAllStudentInfo" resultMap="studentWithUserAndClassResultMap">
+        SELECT s.student_id,s.student_number,s.student_face_id, u.user_id,u.user_name,u.user_realName,u.user_avatar_id,u.user_gender,u.user_email,u.user_phone
+        FROM student s
+        INNER JOIN user u ON s.user_id = u.user_id
+    </select>
+
+    <select id="getAllStudentInfoByClassIdTotal" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM student s
+        WHERE s.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </select>
+
+    <select id="getAllStudentInfoByClassId" resultMap="studentWithUserAndClassResultMap">
+        SELECT s.student_id, s.student_number, u.user_name, u.user_realName, u.user_gender, u.user_email, u.user_phone, c.class_name
+        FROM student s
+        INNER JOIN user u ON s.user_id = u.user_id
+        LEFT JOIN class c ON s.class_id = c.class_id
+        WHERE s.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </select>
+
+    <select id="getClassIdById" resultType="java.lang.Integer">
+        SELECT class_id FROM student
+        WHERE student_id = #{id}
+    </select>
+
+    <select id="getStudentIdByClassId" resultType="java.lang.Integer">
+        SELECT student_id FROM student
+        WHERE class_id = #{classId}
+    </select>
+
+    <select id="getStudentByUserId" resultType="com.sake.examination_system.entity.Student">
+        SELECT * FROM student
+        WHERE user_id = #{userId}
+    </select>
+    <select id="getClassIdByNameOrCode" resultType="java.lang.Integer">
+        SELECT class_id
+        FROM class
+        WHERE class_name = #{className} OR class_code = #{className};
+    </select>
+
+    <select id="getAllStudentInClass" resultType="com.sake.examination_system.entity.DTO.UserDTO">
+        SELECT user_id,user_name,user_realName,user_avatar_id,user_gender,user_age,user_email,user_phone
+        FROM user
+        WHERE user_id IN (SELECT user_id FROM student WHERE class_id = #{classId});
+    </select>
+
+    <select id="getAllStudentCountsByClassId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM student s
+        WHERE s.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </select>
+
+    <select id="getStudentCountsByClassId" resultType="java.util.HashMap">
+        SELECT c.class_name AS className, COUNT(s.student_id) AS inClassNumbers
+        FROM class c
+        LEFT JOIN student s ON c.class_id = s.class_id
+        WHERE c.class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+        GROUP BY c.class_name;
+    </select>
+
+    <select id="getFaceurlById" resultType="java.lang.String">
+        SELECT file_url FROM file
+        WHERE file_id = (SELECT student_face_id FROM student WHERE student_id = #{id})
+    </select>
+
+
+    <insert id="addStudent" parameterType="com.sake.examination_system.entity.Student" >
+        <!-- 插入学生信息，使用插入用户信息得到的 userId 作为外键 -->
+        INSERT INTO student (student_number, student_face_id, user_id)
+        VALUES (#{studentNumber}, #{studentFaceId}, #{userId})
+    </insert>
+
+    <update id="addClass">
+        UPDATE student SET class_id = #{classId}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="bowOutClass">
+        UPDATE student SET class_id = 0
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 定义 ResultMap，映射学生信息及用户信息 -->
+    <resultMap id="studentWithUserAndClassResultMap" type="com.sake.examination_system.entity.Student">
+        <id property="studentId" column="student_id" />
+        <result property="studentNumber" column="student_number" />
+        <result property="studentFaceId" column="student_face_id" />
+
+        <!-- 关联查询用户信息 -->
+        <association property="user" javaType="com.sake.examination_system.entity.User">
+            <id property="userId" column="user_id" />
+            <result property="userName" column="user_name" />
+            <result property="userPassword" column="user_password"/>
+            <result property="userRealName" column="user_realName"/>
+            <result property="userRole" column="user_role"/>
+            <result property="userAvatarId" column="user_avatar_id"/>
+            <result property="userGender" column="user_gender"/>
+            <result property="userEmail" column="user_email"/>
+            <result property="userPhone" column="user_phone"/>
+        </association>
+
+        <!-- 关联查询班级信息 -->
+        <association property="myClass" javaType="com.sake.examination_system.entity.Class">
+            <id property="classId" column="class_id" />
+            <result property="className" column="class_name" />
+            <result property="teacherId" column="teacher_id" />
+            <!-- 其他班级信息的映射 -->
+        </association>
+    </resultMap>
+
+</mapper>

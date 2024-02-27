@@ -1,0 +1,19 @@
+.createClassBlock {
+    width: 300px;
+    height: 300px;
+
+    position: absolute;
+    top: 50%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    
+  }
+  
+.createClassBlockInput{
+    width: 200px;
+    height: 100px;
+    margin-left: 20px;
+    margin-top: 120px;
+}
+
+

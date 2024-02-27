@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sake.examination_system.mapper.ExamRecordsMapper">
+    <insert id="addStudentAnswer">
+        INSERT INTO exam_records(student_id,paper_id,title_id,answer) VALUES(#{studentId},#{paperId},#{titleId},#{answerString})
+    </insert>
+
+    <update id="updateRecord">
+        UPDATE exam_records
+        SET
+            is_correct = #{studentRecord.isCorrect},
+            scores =#{studentRecord.scores}
+        WHERE
+            title_id = #{titleId} AND
+            student_id = #{studentId} AND
+            paper_id = #{paperId};
+    </update>
+    <update id="submitCorrectAnswer">
+        UPDATE exam_records
+        SET
+            is_correct = 1,
+            scores = #{scores}
+        WHERE
+            title_id = #{titleId} AND
+            student_id = #{studentId} AND
+            paper_id = #{paperId};
+    </update>
+
+    <select id="getRecordsByStudentIdAndPaperId" resultType="com.sake.examination_system.entity.ExamRecords">
+        SELECT * FROM  exam_records
+        WHERE paper_id = #{paperId} AND student_id = #{studentId}
+    </select>
+
+</mapper>

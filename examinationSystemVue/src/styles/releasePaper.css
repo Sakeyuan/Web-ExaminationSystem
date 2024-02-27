@@ -1,0 +1,50 @@
+.shadow-box {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.title-div {
+    display: block;
+    align-items: center;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.title-div::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    width: 100%;
+    border-bottom: 1px dashed #ccc;
+}
+
+.select-input-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.answer-div {
+    margin-left: 50px;
+}
+
+.select-item {
+    margin-right: 80px;
+    /* 或者你希望的间距大小 */
+}
+
+.dot-separator {
+    margin-right: 5px;
+}
+
+.colon-separator {
+    margin-right: 10px;
+}
+
+.solid-line {
+    border-top: 1px solid #000;
+    /* 实线样式 */
+    margin-top: 10px;
+    /* 调整上边距 */
+}
