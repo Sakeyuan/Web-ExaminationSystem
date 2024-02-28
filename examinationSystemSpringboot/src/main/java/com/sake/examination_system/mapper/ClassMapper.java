@@ -29,5 +29,4 @@ public interface ClassMapper {
 
     Class getClassById(int classId);
 
-    void addNumber(Integer classId);
 }

@@ -142,7 +142,6 @@ public class ClassServiceImp implements ClassService {
             return new MyResponseEntity<>(CodeNums.ERROR,"加入失败，班级不存在");
         }
         studentMapper.addClass(SakeUtil.parseAuthorization(request),classId);
-        classMapper.addNumber(classId);
         return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
     }
 

@@ -20,14 +20,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.opencv</groupId>
-			<artifactId>opencv</artifactId>
-			<version>3.4.3</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/src/main/resources/lib/opencv-343.jar</systemPath>
-		</dependency>
-
-		<dependency>
 			<groupId>org.lionsoul</groupId>
 			<artifactId>ip2region</artifactId>
 			<version>2.6.5</version>

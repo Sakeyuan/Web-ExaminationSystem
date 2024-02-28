@@ -3,9 +3,7 @@ package com.sake.examination_system.service;
 import java.io.IOException;
 
 public interface FaceRecognitionService {
-    Boolean recognizeFaceWithOpenCV(String imagePath);
-
-    String recognizeFaceWithBaiDu(String imagePath) throws Exception;
+       String recognizeFaceWithBaiDu(String imagePath) throws Exception;
 
     Boolean compareFaces(String img1, String img2) throws Exception;
 

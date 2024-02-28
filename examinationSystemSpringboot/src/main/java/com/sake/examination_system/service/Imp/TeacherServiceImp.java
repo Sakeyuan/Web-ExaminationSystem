@@ -2,7 +2,6 @@ package com.sake.examination_system.service.Imp;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
-import com.sake.examination_system.entity.Class;
 import com.sake.examination_system.entity.DTO.InviteDTO;
 import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.DTO.SingleInviteDTO;
@@ -16,7 +15,6 @@ import com.sake.examination_system.util.MyResponseEntity;
 import com.sake.examination_system.util.SakeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -25,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -76,7 +73,7 @@ public class TeacherServiceImp implements TeacherService {
                 studentNumbers.add(studentData);
             }
         }
-        return new MyResponseEntity<Object>(CodeNums.SUCCESS,"解析成功",studentNumbers.size(),studentNumbers);
+        return new MyResponseEntity<>(CodeNums.SUCCESS,"解析成功",studentNumbers.size(),studentNumbers);
     }
 
     @Transactional
@@ -101,26 +98,32 @@ public class TeacherServiceImp implements TeacherService {
     @Override
     public MyResponseEntity<Object> inviteStudent(InviteDTO studentList) {
         int classId = Integer.parseInt(studentList.getClassId());
-        MyResponseEntity<Object> r = new MyResponseEntity<Object>(CodeNums.SUCCESS,"邀请成功");
         HashMap<String, String> data = new HashMap<>();
         for (String studentInfo : studentList.getData()) {
             String[] parts = studentInfo.split("-");
             if (parts.length == 2) {
                 String name = parts[0];
                 String number = parts[1];
-                int res = studentMapper.inviteStudentToClass(classId,number);
-                if(res == 0){
-                    data.put(name,number);
+                Integer hadClass =  studentMapper.getClassIdByNumber(number);
+                if(hadClass != null && hadClass != 0){
+                    int res = studentMapper.inviteStudentToClass(classId,number);
+                    if(res == 0){
+                        data.put(name,number);
+                    }
                 }
             }
         }
-        r.setData(data);
-        return r;
+        return new MyResponseEntity<>(CodeNums.SUCCESS,"邀请成功",data);
     }
 
     @Override
     public MyResponseEntity<Object> singleInvite(SingleInviteDTO studentInfo) {
-        if(studentMapper.inviteStudentToClass(Integer.parseInt(studentInfo.getClassId()),studentInfo.getStudentNumber()) == 0){
+        int classId = Integer.parseInt(studentInfo.getClassId());
+        Integer hadClass =  studentMapper.getClassIdByNumber(studentInfo.getStudentNumber());
+        if(hadClass != null){
+            return new MyResponseEntity<>(CodeNums.ERROR,"邀请失败,学生已经存在班级");
+        }
+        if(studentMapper.inviteStudentToClass(classId,studentInfo.getStudentNumber()) == 0){
             return new MyResponseEntity<>(CodeNums.ERROR,"邀请失败");
         }
         return new MyResponseEntity<>(CodeNums.SUCCESS,"邀请成功");

@@ -164,10 +164,7 @@
                         this.$message.success("邀请成功");
                     }
                     else {
-                        this.$message({
-                            message: res.message,
-                            type: 'error'
-                        });
+                        this.$message.warn(res.message);
                     }
                 })
             },

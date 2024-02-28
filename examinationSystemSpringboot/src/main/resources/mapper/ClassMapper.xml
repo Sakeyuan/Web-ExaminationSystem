@@ -5,13 +5,6 @@
         INSERT INTO class(class_name,class_code,teacher_id) VALUES(#{className},#{classCode},#{id})
     </insert>
 
-    <update id="addNumber">
-        UPDATE class
-        SET student_numbers = student_numbers + 1
-        WHERE class_id = #{classId}; -- 你可能需要一个 WHERE 子句来指定更新的条件
-
-    </update>
-
     <delete id="removeClass">
         DELETE FROM class WHERE class_id = #{classId}
     </delete>

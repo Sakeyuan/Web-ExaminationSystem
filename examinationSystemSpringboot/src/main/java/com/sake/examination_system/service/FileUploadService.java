@@ -5,14 +5,9 @@ import com.sake.examination_system.entity.DTO.RegisterDTO;
 import com.sake.examination_system.entity.User;
 import com.sake.examination_system.entity.myFile;
 import com.sake.examination_system.util.MyResponseEntity;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface FileUploadService {

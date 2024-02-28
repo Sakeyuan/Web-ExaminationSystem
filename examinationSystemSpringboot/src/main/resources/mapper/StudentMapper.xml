@@ -131,6 +131,11 @@
         WHERE file_id = (SELECT student_face_id FROM student WHERE student_id = #{id})
     </select>
 
+    <select id="getClassIdByNumber" resultType="java.lang.Integer">
+        SELECT class_id FROM student
+        WHERE student_number = #{studentNumber}
+    </select>
+
 
     <insert id="addStudent" parameterType="com.sake.examination_system.entity.Student" >
         <!-- 插入学生信息，使用插入用户信息得到的 userId 作为外键 -->
@@ -144,7 +149,7 @@
     </update>
 
     <update id="bowOutClass">
-        UPDATE student SET class_id = 0
+        UPDATE student SET class_id = NULL
         WHERE user_id = #{userId}
     </update>
 

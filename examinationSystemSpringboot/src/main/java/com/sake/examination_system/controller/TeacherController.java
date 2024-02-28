@@ -4,7 +4,6 @@ import com.sake.examination_system.entity.DTO.InviteDTO;
 import com.sake.examination_system.entity.DTO.SingleInviteDTO;
 import com.sake.examination_system.service.TeacherService;
 import com.sake.examination_system.util.MyResponseEntity;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -38,4 +38,6 @@ public interface StudentMapper {
 
 
     String getFaceurlById(int id);
+
+    Integer getClassIdByNumber(String studentNumber);
 }

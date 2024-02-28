@@ -3,11 +3,13 @@ import axios from 'axios'
 import { Message } from 'element-ui'; // 引入 Message 组件
 import store from '@/store';
 import api from '@/api';
+import { serverIp } from '../../public/config';
 
 const instance = axios.create({
-	baseURL: 'http://localhost:9090',  
+  baseURL: `http://${serverIp}:9090`,  // 使用反引号（`）进行模板字符串
   timeout: 20000
-})
+});
+
 
 instance.interceptors.request.use(config => {
   const token = localStorage.getItem('token');

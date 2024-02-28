@@ -5,12 +5,6 @@ import com.sake.examination_system.entity.FaceMatchResult;
 import com.sake.examination_system.service.FaceRecognitionService;
 
 import com.sake.examination_system.util.SakeUtil;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.core.MatOfRect;
-import org.opencv.imgcodecs.Imgcodecs;
-
-import org.opencv.objdetect.CascadeClassifier;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -22,31 +16,31 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class FaceRecognitionServiceImp implements FaceRecognitionService {
-    private static CascadeClassifier faceDetector;
+    //private static CascadeClassifier faceDetector;
 
-    @Override
-    public Boolean recognizeFaceWithOpenCV(String imagePath) {
-        if (faceDetector == null) {
-            initializeOpenCV();
-        }
-        try {
-            // 读取图像文件为字节数组
-            byte[] imageData = readImageFile(imagePath);
-
-            // 将字节数组转换为 OpenCV Mat 对象
-            Mat image = Imgcodecs.imdecode(new MatOfByte(imageData), Imgcodecs.IMREAD_UNCHANGED);
-
-            // 进行人脸检测
-            MatOfRect faces = new MatOfRect();
-            faceDetector.detectMultiScale(image, faces);
-
-            // 返回是否检测到人脸
-            return faces.toArray().length > 0;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+//    @Override
+//    public Boolean recognizeFaceWithOpenCV(String imagePath) {
+//        if (faceDetector == null) {
+//            initializeOpenCV();
+//        }
+//        try {
+//            // 读取图像文件为字节数组
+//            byte[] imageData = readImageFile(imagePath);
+//
+//            // 将字节数组转换为 OpenCV Mat 对象
+//            Mat image = Imgcodecs.imdecode(new MatOfByte(imageData), Imgcodecs.IMREAD_UNCHANGED);
+//
+//            // 进行人脸检测
+//            MatOfRect faces = new MatOfRect();
+//            faceDetector.detectMultiScale(image, faces);
+//
+//            // 返回是否检测到人脸
+//            return faces.toArray().length > 0;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
 
     @Override
     public String recognizeFaceWithBaiDu(String imagePath) throws Exception {
@@ -155,35 +149,34 @@ public class FaceRecognitionServiceImp implements FaceRecognitionService {
         return byteArrayOutputStream.toByteArray();
     }
 
-    private static synchronized void initializeOpenCV() {
-
-        // 使用正斜杠作为路径分隔符
-        String dir = System.getProperty("user.dir").replace("\\", "/");
-
-        // 构建本机库文件路径
-        String filePath = "/dll/" + (System.getProperty("java.vm.name").contains("64") ? "x64" : "x86") + "/opencv_java343.dll";
-        String path = dir + filePath;
-
-        // 检查本机库文件是否存在
-        File file = new File(path);
-        if (!file.exists()) {
-            throw new RuntimeException("找不到动态库: " + path);
-        }
-        // 加载本机库
-        System.out.println("Loading OpenCV library...");
-        try {
-            System.load(path);
-        } catch (UnsatisfiedLinkError e) {
-            throw new RuntimeException("动态库加载失败: " + path);
-        }
-
-        String casPath = System.getProperty("user.dir").concat("/haarcascades/haarcascade_frontalface_alt.xml");
-
-        faceDetector = new CascadeClassifier(casPath);
-
-        if (faceDetector.empty()) {
-            throw new RuntimeException("检测器初始化失败: " + casPath);
-        }
-
-    }
+//    private static synchronized void initializeOpenCV() {
+//
+//        // 使用正斜杠作为路径分隔符
+//        String dir = System.getProperty("user.dir").replace("\\", "/");
+//
+//        // 构建本机库文件路径
+//        String filePath = "/dll/" + (System.getProperty("java.vm.name").contains("64") ? "x64" : "x86") + "/opencv_java343.dll";
+//        String path = dir + filePath;
+//
+//        // 检查本机库文件是否存在
+//        File file = new File(path);
+//        if (!file.exists()) {
+//            throw new RuntimeException("找不到动态库: " + path);
+//        }
+//        // 加载本机库
+//        System.out.println("Loading OpenCV library...");
+//        try {
+//            System.load(path);
+//        } catch (UnsatisfiedLinkError e) {
+//            throw new RuntimeException("动态库加载失败: " + path);
+//        }
+//
+//        String casPath = System.getProperty("user.dir").concat("/haarcascades/haarcascade_frontalface_alt.xml");
+//
+//        faceDetector = new CascadeClassifier(casPath);
+//
+//        if (faceDetector.empty()) {
+//            throw new RuntimeException("检测器初始化失败: " + casPath);
+//        }
+//    }
 }
