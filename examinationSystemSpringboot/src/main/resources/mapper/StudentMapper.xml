@@ -136,6 +136,11 @@
         WHERE student_number = #{studentNumber}
     </select>
 
+    <select id="getIdByClassId" resultType="java.lang.Integer">
+        SELECT student_id FROM student
+        WHERE class_id = #{classId}
+    </select>
+
 
     <insert id="addStudent" parameterType="com.sake.examination_system.entity.Student" >
         <!-- 插入学生信息，使用插入用户信息得到的 userId 作为外键 -->

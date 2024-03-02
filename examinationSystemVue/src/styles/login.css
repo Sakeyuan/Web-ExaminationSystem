@@ -10,6 +10,19 @@
     background-color: rgba(0, 0, 0, 0); /* 完全透明 */
 }
 
+.login-page .back-link {
+    font-size: 16px;
+    color: #5d2e6e; /* 修改为你想要的颜色 */
+    cursor: pointer;
+    margin-right: 10px; /* 调整右边距，使其与其他元素对齐 */
+    margin-top: 100px;
+}
+
+.login-page .back-link:hover {
+    text-decoration: underline; /* 鼠标悬停时添加下划线效果 */
+}
+
+
 .login-page {
     margin: 0;
     padding: 0;

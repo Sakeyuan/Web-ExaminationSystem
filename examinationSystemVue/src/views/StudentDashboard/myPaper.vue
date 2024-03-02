@@ -68,16 +68,14 @@
                 }
             },
             goToExam(item) {
-                // this.dialogVisible = true;
-                // this.$nextTick(() => {
-                //     this.$refs.camera.setShowUploadImgBtn(false);
-                // });
-
+                this.dialogVisible = true;
+                this.$nextTick(() => {
+                    this.$refs.camera.setShowUploadImgBtn(false);
+                });
                 const itemString = JSON.stringify(item);
                 const parsedItem = JSON.parse(itemString);
                 localStorage.setItem('paperItem', itemString);
                 localStorage.setItem('examRemainingTime', parsedItem.paperTotalTime);
-                this.$router.push("/exam");
             },
             uploadFile(file) {
                 this.file = file;
@@ -113,7 +111,7 @@
                             loadingInstance.close();
                             localStorage.removeItem('paperItem');
                             localStorage.removeItem('examRemainingTime');
-                            this.$message(res.message);
+                            this.$message.error(res.message);
                         }
                     }).catch(error => {
                         localStorage.removeItem('paperItem');

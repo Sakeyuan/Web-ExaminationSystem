@@ -9,5 +9,4 @@ public class StudentPaper {
     private boolean isFinish;
     private boolean isCorrect;
     private int scores;
-
 }

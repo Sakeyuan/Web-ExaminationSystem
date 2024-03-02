@@ -26,7 +26,11 @@
                     {{ paperTotalTimeInHours[scope.$index] }}
                 </template>
             </el-table-column>
-
+            <el-table-column :label="'学生考试总时长'" align="center">
+                <template slot-scope="scope">
+                    {{ studentSpendTime[scope.$index] }}
+                </template>
+            </el-table-column>
             <el-table-column prop="paperCreateStamp" label="创建时间" align="center"></el-table-column>
             <el-table-column prop="operate" label="操作" align="center">
                 <template slot-scope="scope">
@@ -77,6 +81,15 @@
                     const hours = Math.floor(item.paperTotalTime / 60);
                     const minutes = item.paperTotalTime % 60;
                     return `${hours}小时${minutes}分钟`;
+                });
+            },
+            studentSpendTime() {
+                return this.tableData.map(item => {
+                    const hours = Math.floor(item.spendTime / 3600);
+                    const minutes = Math.floor((item.spendTime % 3600) / 60);
+                    const seconds = item.spendTime % 60;
+
+                    return `${hours}小时${minutes}分钟${seconds}秒`;
                 });
             },
         },

@@ -2,6 +2,7 @@ package com.sake.examination_system.service;
 
 import com.sake.examination_system.entity.DTO.CorrectAnswerDTO;
 import com.sake.examination_system.entity.DTO.PageDTO;
+import com.sake.examination_system.entity.DTO.PaperAddClassDTO;
 import com.sake.examination_system.entity.DTO.PaperDTO;
 import com.sake.examination_system.util.MyResponseEntity;
 
@@ -33,4 +34,6 @@ public interface PaperService {
     MyResponseEntity<Object> getStudentHomeData(int id);
 
     MyResponseEntity<Object> getOnePaperWithContentAndScoreAndEmpty(int paperId);
+
+    MyResponseEntity<Object> addPaperClass(PaperAddClassDTO paperAddClassDTO);
 }

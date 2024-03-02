@@ -19,7 +19,7 @@
                         </div>
                         <div class="input-group flex" style="margin-top: 20px">
                             <router-link to="/forgot-password" class="forgot">
-                                <i class="el-icon-question mr-2"></i>忘记密码?
+                                <i class="el-icon-question mr-2"></i>忘记密码
                             </router-link>
                         </div>
                         <div class="input-group right">

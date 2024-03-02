@@ -8,10 +8,31 @@ public class PaperWithStudentDTO extends Paper {
 
     private String studentNumber;
 
-    @TableField("user_realName")
     private String userRealName;
 
     private String className;
+
+    @TableField("scores")
+    private int scores;
+
+    @TableField("spend_time")
+    private Long spendTime;
+
+    public int getScores() {
+        return scores;
+    }
+
+    public void setScores(int scores) {
+        this.scores = scores;
+    }
+
+    public Long getSpendTime() {
+        return spendTime;
+    }
+
+    public void setSpendTime(Long spendTime) {
+        this.spendTime = spendTime;
+    }
 
     public String getClassName() {
         return className;

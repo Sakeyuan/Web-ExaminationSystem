@@ -124,7 +124,7 @@ public class TeacherServiceImp implements TeacherService {
             return new MyResponseEntity<>(CodeNums.ERROR,"邀请失败,学生已经存在班级");
         }
         if(studentMapper.inviteStudentToClass(classId,studentInfo.getStudentNumber()) == 0){
-            return new MyResponseEntity<>(CodeNums.ERROR,"邀请失败");
+            return new MyResponseEntity<>(CodeNums.ERROR,"邀请失败，学生不存在");
         }
         return new MyResponseEntity<>(CodeNums.SUCCESS,"邀请成功");
     }

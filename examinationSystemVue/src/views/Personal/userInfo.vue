@@ -193,6 +193,14 @@
           userPhone: '',
         },
         rules: {
+          userRealName: [
+            { required: true, message: '请输入真实姓名', trigger: 'blur' },
+            { pattern: /^[\u4E00-\u9FA5]{2,4}$/, message: '请输入2-4个中文字符', trigger: ['blur', 'change'] }
+          ],
+          userEmail: [
+            { required: true, message: '请输入邮箱', trigger: 'blur' },
+            { type: 'email', message: '请输入有效的邮箱地址', trigger: ['blur', 'change'] }
+          ],
           nickname: [
             { required: true, message: '请输入昵称', trigger: 'change' }
           ],

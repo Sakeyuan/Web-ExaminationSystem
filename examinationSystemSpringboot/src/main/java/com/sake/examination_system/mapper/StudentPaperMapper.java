@@ -29,4 +29,7 @@ public interface StudentPaperMapper {
 
     Boolean getPaperIsFinish(int studentId, int paperId);
 
+    Integer getClassScoreAvg(List<Integer> studentIdList);
+
+    void updateSpendTime(int paperId, int studentId, Long spendTime);
 }

@@ -76,4 +76,13 @@
         WHERE class_id = #{classId}
     </select>
 
+    <select id="getIdSByClassName" resultType="java.lang.Integer">
+        SELECT class_id FROM class
+        WHERE class_name IN
+        <foreach collection="classList" item="className" open="(" separator="," close=")">
+            #{className}
+        </foreach>
+    </select>
+
+
 </mapper>

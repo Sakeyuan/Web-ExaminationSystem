@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/ip")
 public class IpController {
-
     @GetMapping("/getIp")
     public MyResponseEntity<String> getClientIp(HttpServletRequest request) {
         return SakeUtil.getIpAddress(request);

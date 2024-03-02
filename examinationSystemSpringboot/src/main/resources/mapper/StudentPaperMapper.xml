@@ -23,6 +23,11 @@
             paper_id = #{paperId};
     </update>
 
+    <update id="updateSpendTime">
+        UPDATE student_paper SET spend_time = #{spendTime}
+        WHERE student_id = #{studentId} AND paper_id = #{paperId}
+    </update>
+
     <select id="getPaperIdByStudent" resultType="java.lang.Integer">
         SELECT paper_id FROM student_paper
         WHERE student_id = #{id} AND is_finish = #{isFinish}
@@ -40,7 +45,7 @@
     </select>
 
     <select id="getCorrectPaper" parameterType="map" resultType="com.sake.examination_system.entity.DTO.PaperWithStudentDTO">
-        SELECT p.*, s.student_id, s.student_number, u.user_realName, c.class_name
+        SELECT p.*, sp.spend_time AS spendTime,sp.scores,s.student_id, s.student_number, u.user_realName, c.class_name
         FROM paper p
         JOIN student_paper sp ON p.paper_id = sp.paper_id
         JOIN student s ON sp.student_id = s.student_id
@@ -97,6 +102,16 @@
     <select id="getPaperIsFinish" resultType="java.lang.Boolean">
         SELECT is_finish FROM student_paper
          WHERE student_id = #{studentId} AND paper_id = #{paperId}
+    </select>
+
+    <select id="getClassScoreAvg" resultType="java.lang.Integer">
+        SELECT AVG(scores) AS average_score
+        FROM student_paper
+        WHERE student_id IN
+        <foreach collection="studentIdList" item="studentId" open="(" separator="," close=")">
+            #{studentId}
+        </foreach>
+        AND is_finish = 1 AND is_correct = 1
     </select>
 
 </mapper>

@@ -2,6 +2,7 @@ package com.sake.examination_system.controller;
 
 import com.sake.examination_system.entity.DTO.CorrectAnswerDTO;
 import com.sake.examination_system.entity.DTO.PageDTO;
+import com.sake.examination_system.entity.DTO.PaperAddClassDTO;
 import com.sake.examination_system.entity.DTO.PaperDTO;
 import com.sake.examination_system.service.PaperService;
 import com.sake.examination_system.util.MyResponseEntity;
@@ -79,5 +80,10 @@ public class PaperController {
     @GetMapping("/getStudentHomeData/{id}")
     public MyResponseEntity<Object> getStudentHomeData(@PathVariable("id")int id){
         return paperService.getStudentHomeData(id);
+    }
+
+    @PostMapping("/addPaperClass")
+    public MyResponseEntity<Object> addPaperClass(@RequestBody PaperAddClassDTO paperAddClassDTO){
+        return paperService.addPaperClass(paperAddClassDTO);
     }
 }

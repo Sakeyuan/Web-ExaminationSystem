@@ -269,6 +269,26 @@ public class PaperServiceImp implements PaperService {
         return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS", 1,resultPaperList.get(0));
     }
 
+    @Override
+    public MyResponseEntity<Object> addPaperClass(PaperAddClassDTO paperAddClassDTO) {
+        try{
+            List<Integer> classIds = classMapper.getIdSByClassName(paperAddClassDTO.getClassList());
+            StudentPaper studentPaper = new StudentPaper();
+            int paperId = paperAddClassDTO.getPaperId();
+            studentPaper.setPaperId(paperId);
+            for (Integer classId : classIds){
+                paperClassMapper.addOne(paperId,classId);
+                List<Integer>studentIdList =  studentMapper.getIdByClassId(classId);
+                for (Integer studentId : studentIdList){
+                    studentPaper.setStudentId(studentId);
+                    studentPaperMapper.addPaper(studentPaper);
+                }
+            }
+            return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
+        }catch (Exception e){
+            throw new ServiceException(CodeNums.ERROR,e.getMessage());
+        }
+    }
 
     @Override
     public boolean singleCompareAnswers(String studentAnswer, String standardAnswer) {

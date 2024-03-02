@@ -44,6 +44,22 @@ public class SakeUtil {
         return SECRET_KEY;
     }
 
+    public static String generateVerificationCode() {
+        // 设置验证码位数
+        int codeLength = 6;
+
+        // 随机数生成器
+        Random random = new Random();
+
+        // 生成验证码
+        StringBuilder verificationCode = new StringBuilder();
+        for (int i = 0; i < codeLength; i++) {
+            verificationCode.append(random.nextInt(10));
+        }
+
+        return verificationCode.toString();
+    }
+
     public static String getAccessToken(String apiKey, String apiSecretKey) throws IOException {
         String tokenUrl = "https://aip.baidubce.com/oauth/2.0/token";
         String grantType = "client_credentials";

@@ -1,4 +1,5 @@
 package com.sake.examination_system.controller;
+import com.sake.examination_system.entity.DTO.EmailCodeDTO;
 import com.sake.examination_system.service.AuthService;
 import com.sake.examination_system.util.MyResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,10 @@ public class AuthController {
         return authService.refreshToken(request,response,refreshToken);
     }
 
+    @PostMapping("/verifyCode")
+    public MyResponseEntity<String> verifyCode(@RequestBody EmailCodeDTO emailCodeDTO){
+        return authService.verifyCode(emailCodeDTO);
+    }
 
 
 }

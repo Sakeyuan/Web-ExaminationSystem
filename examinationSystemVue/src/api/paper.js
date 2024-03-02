@@ -42,6 +42,9 @@ const paperObj = {
     getStudentHomeData(params) { 
         return http.get(`${PAPER_STR}/getStudentHomeData/`+ params)
     },
+    addPaperClass(params) {
+        return http.post(`${PAPER_STR}/addPaperClass`, params)
+    }
     
 }
 

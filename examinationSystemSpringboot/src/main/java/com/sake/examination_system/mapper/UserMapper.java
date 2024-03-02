@@ -22,5 +22,9 @@ public interface UserMapper {
     String getAvatarByUserId(int userId);
 
     void updateUserInfo(User user);
+
+    Integer getTotalByEmail(String email);
+
+    void setPasswordByEmail(String email, String password);
 }
 

@@ -1,98 +1,100 @@
 <template>
-    <h1>剩余时间：{{ remainingMinutes }}</h1>
+    <div class="login-page">
+        <div class="login-container">
+            <div class="form-container">
+                <div class="form-body">
+                    <div class="header">
+                        <h2>重置密码</h2>
+                        <p>
+                            没有账户? <router-link to="/register">创建账户</router-link>
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <el-input type="text" placeholder="请输入密码" v-model="email" suffix-icon="el-icon-s-check">
+                            </el-input>
+                        </div>
+                        <div style="display: flex">
+                            <el-input type="text" placeholder="请再次输入密码" suffix-icon="el-icon-s-check"
+                                v-model="verificationCode"></el-input>
+                        </div>
+                        <div class="input-group right">
+                            <el-button @click="confirm" style="margin-top:30px">确认</el-button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-image">
+                    <div class="text">
+                        <h2>欢迎使用考试系统</h2>
+                        <p>Sake考试系统为您服务!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
-    import io from 'socket.io-client';
+    import "@/styles/login.css";
+    import "@/styles/global.css";
 
     export default {
         data() {
             return {
-                socket: null,
-                localStorageKey: "examRemainingTime",
-                websocketUrl: "ws://localhost:9090/websocket/",
-                remainingTime: 0,
-                remainingMinutes: 0,
-                timer: null,
+                isSending: false,
+                email: "",
+                verificationCode: "",
+                countdown: 60,
+                isCounting: false, // 控制按钮状态
             };
         },
-        created() {
-            localStorage.setItem(this.localStorageKey, 5 * 60);
-            localStorage.setItem("userId", 3);
-            this.initWebSocket();
-        },
         methods: {
-            startTime() {
-                this.loadRemainingTime(); // 从 localStorage 加载剩余时间
-                this.updateTimer(); // 初始更新一次
-                this.timer = setInterval(this.updateTimer, 1000); // 每秒更新一次
-            },
-            loadRemainingTime() {
-                const savedRemainingTime = localStorage.getItem(this.localStorageKey);
-                if (savedRemainingTime) {
-                    this.remainingTime = parseInt(savedRemainingTime, 10);
-                    this.timerInterval = savedRemainingTime;
-                }
-            },
-            saveRemainingTime() {
-                localStorage.setItem(this.localStorageKey, this.remainingTime.toString());
-            },
-            updateTimer() {
-                this.remainingMinutes = Math.ceil(this.remainingTime / 60); // 使用 Math.ceil 向上取整
-                if (this.remainingTime > 0) {
-                    this.remainingTime -= 1;
-                    this.saveRemainingTime(); // 每秒保存剩余时间到 localStorage
-                } else {
-                    clearInterval(this.timer);
-                    localStorage.removeItem(this.localStorageKey);
-                }
-            },
-            initWebSocket() {
-                this.socket = new WebSocket(this.websocketUrl + localStorage.getItem("userId"));
-                this.socket.onopen = this.webSocketOnopen;
-                this.socket.onmessage = this.webSocketOnmessage;
-                this.socket.onerror = this.webSocketOnerror;
-                this.socket.onclose = this.webSocketClose;
-            },
-            // 连接成功后调用
-            webSocketOnopen() {
-                const messageObject = {
-                    command: "uploadExamTotalTime",
-                    data: {
-                        userId: parseInt(localStorage.getItem("userId")),
-                        examTotalTime: parseInt(localStorage.getItem(this.localStorageKey))
+            async sendVerificationCode(event) {
+                event.preventDefault();
+                if (this.email && this.isValidEmail(this.email)) {
+                    console.log("发送验证码中...........");
+                    this.isSending = true; // 设置发送中状态
+                    try {
+                        const res = await this.$api.userObj.sendCode(this.email);
+                        if (res.code === 2000) {
+                            this.$message.success("发送成功");
+                            this.startCountdown();
+                        }
+                    } catch (error) {
+                        console.error("发送验证码请求错误:", error);
+                    } finally {
+                        this.isSending = false; // 无论请求成功或失败，都要设置发送结束状态
                     }
-                };
-                this.webSocketSend(JSON.stringify(messageObject));
-                this.startTime();
-            },
-            // 发生错误时调用
-            webSocketOnerror() {
-                console.log("WebSocket连接发生错误");
-            },
-
-            webSocketOnmessage(event) {
-                const data = JSON.parse(event.data);
-                if (data.type === "uploadRemainingTime") {
-                    this.remainingTime = data.data.remainingTime;
-                    this.updateTimer();
+                } else {
+                    this.$message.error("请输入有效的邮箱地址");
                 }
             },
-
-            webSocketSend(message) {
-                console.log("WebSocket发送消息:" + message);
-                this.socket.send(message);
+            startCountdown() {
+                this.isCounting = true;
+                const timer = setInterval(() => {
+                    this.countdown -= 1;
+                    if (this.countdown <= 0) {
+                        this.resetCountdown();
+                        clearInterval(timer);
+                    }
+                }, 1000);
             },
-            webSocketClose(e) {
-                console.log("WebSocket连接关闭 (" + e.code + ")");
+            resetCountdown() {
+                this.countdown = 60;
+                this.isCounting = false;
             },
-        },
-        beforeDestroy() {
-            localStorage.removeItem(this.localStorageKey);
-            clearInterval(this.timer);
-            if (this.socket) {
-                this.socket.close();
-            }
+            isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            },
+            confirm() {
+                if (this.verificationCode) {
+                }
+                else {
+                    this.$message.error("请输入验证码");
+                }
+            },
         },
     };
 </script>

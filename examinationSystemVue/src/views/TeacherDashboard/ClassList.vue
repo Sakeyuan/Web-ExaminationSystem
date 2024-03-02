@@ -45,7 +45,8 @@
         <el-dialog title="创建班级" :visible.sync="createClassDialogVisible" style="width: 800px">
             <el-form :model="form">
                 <el-form-item label="班级名称" :label-width="formLabelWidth">
-                    <el-input v-model="form.className" autocomplete="off" style="width: 200px" placeholder="请输入班级名称">
+                    <el-input v-model="form.className" autocomplete="off" style="width: 200px" placeholder="请输入班级名称"
+                        @keyup.enter.native="createClassByName">
                     </el-input>
                 </el-form-item>
             </el-form>

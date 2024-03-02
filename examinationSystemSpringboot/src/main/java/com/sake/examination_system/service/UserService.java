@@ -1,5 +1,6 @@
 package com.sake.examination_system.service;
 
+import com.sake.examination_system.entity.DTO.EmailCodeDTO;
 import com.sake.examination_system.entity.Student;
 import com.sake.examination_system.entity.User;
 import com.sake.examination_system.util.MyResponseEntity;
@@ -14,10 +15,13 @@ public interface UserService {
     MyResponseEntity<Object> getPersonalInfo(HttpServletRequest request);
     User getUserById(int userId);
 
-
     String getAvatarByUserId(int parseInt);
 
     int uploadAvatar(MultipartFile file) throws Exception;
 
     void updateUserInfo(User user);
+
+    MyResponseEntity<Object> sendVerificationCode(String email);
+
+    MyResponseEntity<Object> setPassword(EmailCodeDTO emailCodeDTO);
 }

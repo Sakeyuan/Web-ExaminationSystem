@@ -9,7 +9,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry){
         registry.addMapping("/**")
-                .allowedOriginPatterns("*") // 或者具体的域名，例如："https://example.com"
+                .allowedOriginPatterns("*")
                 .allowedMethods("*")
                 .maxAge(168000)
                 .allowedHeaders("*")

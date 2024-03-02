@@ -21,30 +21,17 @@
             <el-table-column prop="className" label="所属班级" align="center"></el-table-column>
             <el-table-column prop="paperName" label="试卷名称" align="center"></el-table-column>
             <el-table-column prop="paperScore" label="试卷总分" align="center"></el-table-column>
-            <el-table-column :label="'考试时长'" align="center">
+            <el-table-column :label="'考试总时长'" align="center">
                 <template slot-scope="scope">
                     {{ paperTotalTimeInHours[scope.$index] }}
                 </template>
             </el-table-column>
-
-            <el-table-column prop="paperCreateStamp" label="创建时间" align="center"></el-table-column>
-            <el-table-column prop="paperStartTime" label="开始时间" align="center">
+            <el-table-column :label="'学生考试总时长'" align="center">
                 <template slot-scope="scope">
-                    {{ scope.row.paperStartTime || '——' }}
+                    {{ studentSpendTime[scope.$index] }}
                 </template>
             </el-table-column>
-
-            <el-table-column prop="paperEndTime" label="结束时间" align="center">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.paperStartTime ? scope.row.paperStartTime : '——' }}</span>
-                </template>
-            </el-table-column>
-
-            <el-table-column prop="expire" label="是否过期">
-                <template slot-scope="scope">
-                    <span>{{ scope.row.expire ? '已过期' : '未过期' }}</span>
-                </template>
-            </el-table-column>
+            <el-table-column prop="scores" label="得分" align="center"></el-table-column>
             <el-table-column prop="operate" label="操作" align="center">
                 <template slot-scope="scope">
                     <el-button type="primary" @click="getHadCorrectPaper(scope.row.paperId,scope.row.studentId)">
@@ -95,7 +82,17 @@
                     return `${hours}小时${minutes}分钟`;
                 });
             },
+            studentSpendTime() {
+                return this.tableData.map(item => {
+                    const hours = Math.floor(item.spendTime / 3600);
+                    const minutes = Math.floor((item.spendTime % 3600) / 60);
+                    const seconds = item.spendTime % 60;
+
+                    return `${hours}小时${minutes}分钟${seconds}秒`;
+                });
+            },
         },
+
         mounted() {
             this.load();
             this.loadClass();

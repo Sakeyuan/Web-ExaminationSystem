@@ -250,9 +250,9 @@ public class FileUploadServiceImp implements FileUploadService {
         Boolean isRight = faceRecognitionService.compareFaces(fileUuid,studentFacePath);
         if(isRight){
             uploadFile.delete();
-            return new MyResponseEntity<>(CodeNums.SUCCESS,"比对成功");
+            return new MyResponseEntity<>(CodeNums.SUCCESS,"识别成功");
         }
-        return new MyResponseEntity<>(CodeNums.ERROR,"失败");
+        return new MyResponseEntity<>(CodeNums.ERROR,"识别失败，人脸不一致，请重新尝试");
     }
 
     private MyResponseEntity<String>getImgFile(String fileName, String filePath) {

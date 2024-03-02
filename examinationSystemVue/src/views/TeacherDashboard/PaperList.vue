@@ -11,12 +11,13 @@
                     style="margin-left: 2px"></i>
             </el-button>
         </div>
-        <el-table :data="tableData" :header-cell-class-name="tableTitle" @selection-change="handleSelectionChange">
+        <el-table :data="tableData" :header-cell-class-name="tableTitle" @selection-change="handleSelectionChange"
+            border>
             <el-table-column type="selection" width="55">
             </el-table-column>
             <el-table-column prop="paper.paperName" label="试卷名称"></el-table-column>
-            <el-table-column prop="paper.paperCreateStamp" label="创建时间"></el-table-column>
-            <el-table-column prop="paper.paperTotalTime" label="考试总时长">
+            <el-table-column prop="paper.paperCreateStamp" label="创建时间" width="100px"></el-table-column>
+            <el-table-column prop="paper.paperTotalTime" width="100px" label="考试总时长">
                 <template slot-scope="scope">
                     {{ paperTotalTimeInHours[scope.$index] }}
                 </template>
@@ -39,11 +40,14 @@
             </el-table-column>
             <el-table-column prop="operate" label="操作">
                 <template slot-scope="scope">
-                    <el-button type="primary" size="mini" class="mr-2" @click="getPaperDetail(scope.row.paper.paperId)">
+                    <el-button type="primary" size="mini" @click="getPaperDetail(scope.row.paper.paperId)">
                         详情
                     </el-button>
+                    <el-button type="primary" size="mini" class="mr-5" @click="paperAddClass(scope.row.paper.paperId)">
+                        添加班级
+                    </el-button>
                     <el-popconfirm confirm-button-text='确定' cancel-button-text='取消' icon="el-icon-info" icon-color="red"
-                        title="是否删除该题目？" @confirm="deletePaperById(scope.row.paper.paperId)">
+                        title="是否删除该题目？" @confirm="deletePaperById(scope.row.paper.paperId)" class="ml-2">
                         <el-button slot="reference" type="danger" size="mini">删除</el-button>
                     </el-popconfirm>
                 </template>
@@ -55,6 +59,20 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="batchDelById">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog title="添加班级" :visible.sync="addClassDialogVisible" width="50%" :before-close="handleClose">
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选
+            </el-checkbox>
+            <div style="margin: 15px 0;"></div>
+            <el-checkbox-group v-model="checkedClass" @change="handleCheckedChange">
+                <el-checkbox v-for="classItem in classList" :label="classItem.className" :key="classItem.classId"
+                    :disabled="classItem.isPublished">{{ classItem.className }}</el-checkbox>
+            </el-checkbox-group>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addClassDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="addPaperClass">确 定</el-button>
             </span>
         </el-dialog>
 
@@ -85,13 +103,16 @@
                 batchDialogVisible: false,
                 multipleSelection: [],
                 classList: [],
+                addClassDialogVisible: false,
+                isIndeterminate: true,
+                checkAll: false,
+                checkedClass: [],
+                addPaperId: 0,
             }
         },
         computed: {
-            // 计算属性：将 paperTotalTime 转换为小时
             paperTotalTimeInHours() {
                 return this.tableData.map(item => {
-                    // 将分钟转换为小时
                     const hours = Math.floor(item.paper.paperTotalTime / 60);
                     // 计算剩余的分钟数
                     const minutes = item.paper.paperTotalTime % 60;
@@ -110,6 +131,63 @@
             },
         },
         methods: {
+            addPaperClass() {
+                if (this.addPaperId == 0) {
+                    this.$message.warn("请选择试卷");
+                    return;
+                }
+                const data = {
+                    paperId: this.addPaperId,
+                    classList: this.checkedClass,
+                }
+                this.$api.paperObj.addPaperClass(data).then(res => {
+                    if (res.code === 2000) {
+                        this.$message.success("添加成功");
+                        this.addClassDialogVisible = false;
+                        this.load();
+                    }
+                    else {
+                        this.$message.error("添加失败");
+                    }
+                })
+            },
+            handleClose(done) {
+                done();
+            },
+            getAllClassByTeacherId() {
+                this.$api.classObj.getAllClassByTeacherId(localStorage.getItem("id")).then(res => {
+                    if (res.code == 2000) {
+                        this.classList = res.data.map(classItem => {
+                            // 添加一个属性 isPublished，表示该班级是否已发布
+                            classItem.isPublished = this.tableData.some(paper => paper.classList.some(c => c.classId === classItem.classId));
+                            return classItem;
+                        });
+                    }
+                    else {
+                        this.$message.error(res.message)
+                    }
+                })
+            },
+            handleCheckedChange(value) {
+                let checkedCount = value.length;
+                this.checkAll = checkedCount === this.classList.length;
+                this.isIndeterminate = checkedCount > 0 && checkedCount < this.classList.length;
+                this.checkedClass = value;
+            },
+            handleCheckAllChange(val) {
+                if (val) {
+                    this.checkedClass = this.classList.map(classItem => classItem.className);
+                }
+                else {
+                    this.checkedClass = [];
+                }
+                this.isIndeterminate = false;
+            },
+            paperAddClass(paperId) {
+                this.addClassDialogVisible = true;
+                this.addPaperId = paperId;
+                this.getAllClassByTeacherId();
+            },
             getPaperDetail(paperId) {
                 this.$router.push({
                     path: "/teacher/paperDetail",

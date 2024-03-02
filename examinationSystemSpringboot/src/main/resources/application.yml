@@ -1,7 +1,31 @@
 server:
   port: 9090
-
+  
+mail:
+  sender:
+    email: a13100471406@163.com
 spring:
+  mail:
+    host: smtp.163.com
+    username: a13100471406@163.com
+    password: SKDBYXVADJDVHTML  # 请使用你在网易邮箱设置中生成的应用密码或授权码
+    default-encoding: utf-8
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+      smtp:
+        socketFactory:
+          port: 465
+          class: javax.net.ssl.SSLSocketFactory
+    mvc:
+      pathmatch:
+        matching-strategy: ant_path_matcher
+
   redis:
     database: 0
     host: localhost
@@ -46,6 +70,7 @@ files:
     avatarFilePath: ${user.dir}/src/main/resources/static/files/avatars/
     staticFilePath: ${user.dir}/src/main/resources/static
     tmpFaceFilePath: ${user.dir}/src/main/resources/static/files/faces/tmpFaceFilePath/
+
 
 config:
   multifile:

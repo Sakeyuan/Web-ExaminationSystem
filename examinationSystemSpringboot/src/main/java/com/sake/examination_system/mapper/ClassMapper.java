@@ -29,4 +29,5 @@ public interface ClassMapper {
 
     Class getClassById(int classId);
 
+    List<Integer> getIdSByClassName(List<String> classList);
 }

@@ -7,7 +7,7 @@ import { serverIp } from '../../public/config';
 
 const instance = axios.create({
   baseURL: `http://${serverIp}:9090`,  // 使用反引号（`）进行模板字符串
-  timeout: 20000
+  timeout: 30000
 });
 
 

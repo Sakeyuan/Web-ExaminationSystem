@@ -13,6 +13,11 @@
         WHERE user_id = #{userId};
     </update>
 
+    <update id="setPasswordByEmail">
+        UPDATE user SET user_password = #{password}
+        WHERE user_email = #{email}
+    </update>
+
     <select id="getStudentsByUserRealNameTotal" resultType="int">
         SELECT COUNT(*)
         FROM student s
@@ -37,6 +42,11 @@
     <select id="getAvatarByUserId" resultType="java.lang.String">
         SELECT file_url FROM file
         WHERE file_id = (SELECT user_avatar_id FROM user WHERE user_id = #{userId})
+    </select>
+
+    <select id="getTotalByEmail" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM user
+        WHERE user_email = #{email}
     </select>
 
 

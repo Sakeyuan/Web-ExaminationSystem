@@ -28,7 +28,7 @@
                                             <p class="inline-div">{{ index + 1 }}<span
                                                     style="margin-right: 10px">.</span>
                                             </p>
-                                            <span style="display: inline;line-height: 2.0">
+                                            <span style="display: inline;line-height: 3.0">
                                                 {{ question.content.name }}<span class="title-scores">({{
                                                     question.content.scores
                                                     }}分)</span>
@@ -74,7 +74,7 @@
                                                 <span v-if="part.slice(0,5) == 'input'" class="inline-div">
                                                     <el-input
                                                         v-model="studentAnswers[sectionIndex][index][part[part.length-1]]"
-                                                        placeholder="在此处填写答案" class="custom-input" style="padding: 5px">
+                                                        class="custom-input" style="padding: 5px">
                                                     </el-input>
                                                 </span>
                                                 <span v-else class="question-title inline-div"
@@ -87,8 +87,7 @@
                                     <div v-else-if="question.titleType === 5">
                                         <!-- 简答题目 -->
                                         <el-input v-model="studentAnswers[sectionIndex][index]" placeholder="请输入答案"
-                                            class="custom-input-area" type="textarea"
-                                            :autosize="{ minRows: 4, maxRows: 100}">
+                                            type="textarea" :autosize="{ minRows: 4, maxRows: 100}">
                                         </el-input>
                                     </div>
                                 </div>
@@ -105,14 +104,22 @@
                 </el-main>
             </el-container>
         </div>
-        <el-dialog :visible.sync="showExamDialog" title="注意事项" width="50%">
-            <p>请在考试开始前仔细阅读以下注意事项：</p>
-            <ul>
-                <li>请确保在稳定的网络环境下参加考试。</li>
-                <li>禁止使用任何形式的作弊工具。</li>
-            </ul>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="confirmExam">知道了</el-button>
+        <el-dialog :visible.sync="showExamDialog" title="注意事项" width="60%">
+            <div style="text-align: center; padding: 20px;">
+                <p style="font-size: 16px;">请在考试开始前仔细阅读以下注意事项：</p>
+                <ul style="list-style-type: none; padding: 0; margin-bottom: 20px;">
+                    <li style="font-size: 14px; margin-bottom: 10px;">请确保在稳定的网络环境下参加考试。</li>
+                    <li style="font-size: 14px; margin-bottom: 10px;">禁止使用任何形式的作弊工具。</li>
+                    <li style="font-size: 14px; margin-bottom: 10px;">请在规定时间内完成考试。</li>
+                    <li style="font-size: 14px; margin-bottom: 10px;">不要随意离开考试界面，以免影响考试顺利进行。</li>
+                </ul>
+                <div>
+                    <el-icon name="information" style="font-size: 30px; color: #409EFF;"></el-icon>
+                    <p style="font-size: 14px; margin-top: 10px;">如果有任何疑问，请联系考务人员。</p>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer" style="text-align: center;">
+                <el-button @click="confirmExam" type="primary" size="medium">知道了</el-button>
             </div>
         </el-dialog>
     </div>
@@ -165,7 +172,6 @@
             initResizeHandler() {
                 this.debouncedResizeHandler = _.debounce(() => {
                     if (!this.keyDown()) {
-                        // 仅当非全屏时才显示警告
                         this.$alert('考试期间请勿退出全屏，以免影响考试', '警告', {
                             confirmButtonText: '确定',
                             callback: action => {
@@ -273,7 +279,7 @@
                 this.socket.send(message);
             },
             webSocketClose(e) {
-                this.$message.warning("WebSocket连接已关闭");
+                console.log("WebSocket连接已关闭");
             },
             getFillTitleParts(content, sectionIndex, index) {
                 const cacheKey = `${sectionIndex}-${index}`;
@@ -311,14 +317,12 @@
                     spinner: 'el-icon-loading',
                     background: 'rgba(0, 0, 0, 0.7)'
                 });
-
                 const answersWithIds = [];
                 this.questions.forEach((section, sectionIndex) => {
                     section.contents.forEach((question, index) => {
                         const questionId = question.titleId
                         let studentAnswers = this.studentAnswers[sectionIndex][index];
                         if (question.titleType === 4) {
-                            console.log("studentAnswers: " + JSON.stringify(studentAnswers));
                             for (let i = 0; i < studentAnswers.length; i++) {
                                 if (!studentAnswers[i]) {
                                     studentAnswers[i] = "";
@@ -334,15 +338,16 @@
                     answers: answersWithIds
                 }
                 this.$api.examObj.submitAnswers(data).then(res => {
-                    if (res.code == 2000) {
-                        this.$message.success("提交成功");
-                        localStorage.removeItem('paperItem');
-                        this.exitFullScreen();
-                        this.$router.push('/student/myPaper')
-                    }
-                    else {
-                        this.$message.error(res.message);
-                    }
+                    setTimeout(() => {
+                        if (res.code == 2000) {
+                            this.$message.success("提交成功");
+                            localStorage.removeItem('paperItem');
+                            this.exitFullScreen();
+                            this.$router.push('/student/myPaper');
+                        } else {
+                            this.$message.error(res.message);
+                        }
+                    }, 1000);
                 }).catch((error) => {
                     this.$message.error(error.message);
                 }).finally(() => {
@@ -363,7 +368,6 @@
                 }
             },
             startTime() {
-                // 从 localStorage 加载剩余时间
                 this.updateTimer(); // 初始更新一次
                 this.timer = setInterval(this.updateTimer, 1000); // 每秒更新一次
             },

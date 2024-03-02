@@ -11,6 +11,11 @@ const routes = [
     component: () => import('../views/test.vue'),
   },
   {
+    path: '/setPassword',
+    name: 'setPassword',
+    component: () => import('../views/ForgetPassword/setPassword.vue'),
+  },
+  {
     path: '/personal',
     component: () => import('@/views/Personal/index.vue'),
     redirect:'/personal/userInfo',
@@ -243,7 +248,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => { 
   const token = localStorage.getItem('token') || null;
-  if (to.path !== '/' && !token && to.path !== '/register' && to.path !== '/register/student-register' && to.path !== '/register/teacher-register' && to.path !== '/forgetPassword' && to.path !== '/test') { 
+  if (to.path !== '/' && !token && to.path !== '/register' && to.path !== '/register/student-register' && to.path !== '/register/teacher-register' && to.path !== '/forgot-password' && to.path !== '/test' && to.path !== '/setPassword') { 
     next('/'); 
   }
   else if (to.path === '/' && token) {
@@ -256,6 +261,9 @@ router.beforeEach((to, from, next) => {
       } else {
         next('/');
       }
+  }
+  else if (to.path === '/setPassword' && from.path !== '/forgot-password' ) {
+    next('/forgot-password');
   }
   else { 
     next(); 

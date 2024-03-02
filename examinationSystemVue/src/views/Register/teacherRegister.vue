@@ -90,13 +90,15 @@
                     number: this.teacherNumber,
                     role: 2,
                 };
-
                 this.$api.registerObj.teacherRegister(data).then(res => {
                     if (res.code == 2000) {
                         this.$message.success("注册成功");
                         this.$store.commit('setUserRegisterInfo', 0, 0);
                         setTimeout(() => {
-                            this.$router.push("/login");
+                            if (localStorage.getItem('token')) {
+                                this.$store.commit('clearUser');
+                            }
+                            this.$router.push("/");
                         }, 1000);
                     } else {
                         this.$message.error("注册失败" + res.message);

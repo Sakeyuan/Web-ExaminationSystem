@@ -93,6 +93,7 @@
                         console.error('无法访问摄像头:', err);
                     });
             },
+
             setImage() {
                 if (!this.mediaStream) {
                     this.$message.warning('请先打开摄像头');

@@ -8,6 +8,12 @@ const userObj = {
     },
     getAvatar() {
         return http.get(`${USER_STR}/getAvatar`);
+    },
+    sendCode(params) {
+        return http.post(`${USER_STR}/sendVerificationCode`,params);
+    },
+    setPassword(params) {
+        return http.post(`${USER_STR}/setPassword`,params);
     }
 }
 

@@ -2,19 +2,25 @@ package com.sake.examination_system.service.Imp;
 
 import cn.hutool.core.io.FileUtil;
 import com.auth0.jwt.JWT;
+import com.sake.examination_system.entity.DTO.EmailCodeDTO;
 import com.sake.examination_system.entity.UserWithSTF;
 import com.sake.examination_system.entity.Student;
 import com.sake.examination_system.entity.Teacher;
 import com.sake.examination_system.entity.User;
 import com.sake.examination_system.entity.myFile;
+import com.sake.examination_system.exception.ServiceException;
 import com.sake.examination_system.mapper.*;
+import com.sake.examination_system.service.EmailService;
+import com.sake.examination_system.service.RedisService;
 import com.sake.examination_system.service.StudentService;
 import com.sake.examination_system.service.UserService;
 import com.sake.examination_system.util.CodeNums;
 import com.sake.examination_system.util.MyResponseEntity;
 import com.sake.examination_system.util.SakeUtil;
+import com.sun.mail.smtp.SMTPSenderFailedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -38,6 +44,12 @@ public class UserServiceImp implements UserService {
 
     @Resource
     FileMapper fileMapper;
+
+    @Resource
+    EmailService emailService;
+
+    @Resource
+    RedisService redisService;
 
     @Value("${files.upload.avatarFilePath}")
     private String avatarFilePath;
@@ -171,6 +183,29 @@ public class UserServiceImp implements UserService {
     @Override
     public void updateUserInfo(User user) {
         userMapper.updateUserInfo(user);
+    }
+
+    @Override
+    public MyResponseEntity<Object> sendVerificationCode(String email) {
+        try{
+            Integer totalUser = userMapper.getTotalByEmail(email);
+            if(totalUser == null || totalUser == 0){
+                return new MyResponseEntity<>(CodeNums.ERROR,"用户不存在，请创建用户并完善邮箱");
+            }
+            String code = SakeUtil.generateVerificationCode();
+            emailService.sendEmail(email,code);
+            redisService.setValueWithExpire(SakeUtil.generateMD5(email),code,2*60);
+            return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new ServiceException(CodeNums.SUCCESS, "发送验证码失败，请检查邮箱是否有误");
+        }
+    }
+
+    @Override
+    public MyResponseEntity<Object> setPassword(EmailCodeDTO emailCodeDTO) {
+        userMapper.setPasswordByEmail(emailCodeDTO.getEmail(),emailCodeDTO.getPassword());
+        return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
     }
 
     static int saveFileToDB(String originalFileName, String fileType, long fileSize, String fileMd5, String fileUrl, FileMapper fileMapper) {

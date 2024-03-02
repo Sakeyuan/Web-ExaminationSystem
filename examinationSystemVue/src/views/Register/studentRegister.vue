@@ -103,7 +103,7 @@
                             this.$store.commit('setUserRegisterInfo', { userPhone: 0, userPassword: 0 });
                             this.handleClose();
                             setTimeout(() => {
-                                this.$router.push("/login");
+                                this.$router.push("/");
                             }, 1000);
                         }
                         else {
