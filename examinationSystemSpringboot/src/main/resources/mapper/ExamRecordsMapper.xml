@@ -26,9 +26,32 @@
             paper_id = #{paperId};
     </update>
 
+    <update id="updateFavorite">
+        UPDATE exam_records
+        SET
+            is_favorite = #{isFavorite}
+        WHERE
+            title_id = #{titleId} AND
+            student_id = #{studentId} AND
+            paper_id = #{paperId};
+    </update>
+
+    <update id="cancelFavorite">
+        UPDATE exam_records
+        SET
+            is_favorite = 0
+        WHERE
+            exam_id = #{examId}
+    </update>
+
     <select id="getRecordsByStudentIdAndPaperId" resultType="com.sake.examination_system.entity.ExamRecords">
         SELECT * FROM  exam_records
         WHERE paper_id = #{paperId} AND student_id = #{studentId}
+    </select>
+
+    <select id="getExamRecodsByStudentIdAndFavorite" resultType="com.sake.examination_system.entity.ExamRecords">
+        SELECT * FROM exam_records
+        WHERE is_favorite = 1 AND student_id = #{studentId}
     </select>
 
 </mapper>

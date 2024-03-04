@@ -24,6 +24,11 @@ public class TeacherController {
         teacherService.exportInfo(httpServletResponse,id);
     }
 
+    @GetMapping("/exportClassStudent")
+    public void exportClassStudent(HttpServletResponse httpServletResponse,@RequestParam("classId") int classId) throws IOException {
+        teacherService.exportClassStudent(httpServletResponse,classId);
+    }
+
     @PostMapping("/importStudentInfo")
     public MyResponseEntity<Object> importStudent(MultipartFile file) throws IOException {
         return teacherService.importStudent(file);

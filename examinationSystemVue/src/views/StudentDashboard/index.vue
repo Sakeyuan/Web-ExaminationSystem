@@ -19,10 +19,14 @@
                         <el-dropdown @command="handleCommand">
                             <el-avatar :src="avatarUrl"></el-avatar>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item command="personalInfo"><i class="el-icon-user-solid"></i>个人信息
+                                <el-dropdown-item command="personalInfo">
+                                    <font-awesome-icon icon="user" class="mr-5" />个人信息
+                                </el-dropdown-item>
+                                <el-dropdown-item command="myCollection">
+                                    <font-awesome-icon icon="star" class="mr-5" /></i>我的收藏
                                 </el-dropdown-item>
                                 <el-dropdown-item command="logout">
-                                    <font-awesome-icon :icon="['fas', 'right-from-bracket']" class="mr-5" />退出系统
+                                    <font-awesome-icon icon="right-from-bracket" class="mr-5" />退出系统
                                 </el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
@@ -96,6 +100,9 @@
             handleLogout() {
                 this.$store.commit('clearUser');
             },
+            handleMyCollection() {
+                this.$router.push({ path: '/myCollection' });
+            }
 
         }
     }

@@ -44,6 +44,15 @@ const paperObj = {
     },
     addPaperClass(params) {
         return http.post(`${PAPER_STR}/addPaperClass`, params)
+    },
+    favorite(params) {
+        return http.post(`${PAPER_STR}/favorite`, params)
+    },
+    getFavorite(params) {
+        return http.get(`${PAPER_STR}/getFavorite/`+ params)
+    },
+    cancelFavorite(params) { 
+        return http.delete(`${PAPER_STR}/cancelFavorite/`+ params)
     }
     
 }

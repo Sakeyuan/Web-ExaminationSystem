@@ -1,5 +1,5 @@
 <template>
-    <div v-if="tableData && tableData.length > 0">
+    <div v-if="(tableData && tableData.length > 0) || userRealName">
         <div style="padding: 10px 0">
             <el-input style="width: 200px" placeholder="请输入真名搜索" suffix-icon="el-icon-search" class="mr-5"
                 v-model="userRealName">
@@ -13,7 +13,6 @@
             <el-button type="primary" @click="exp">导出所有学生<i class="el-icon-upload2" style="margin-left: 2px"></i>
             </el-button>
         </div>
-
         <el-table :data="tableData" border :header-cell-class-name="tableTitle"
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55">
@@ -79,7 +78,6 @@
                 multipleSelection: []
             }
         },
-        // 在组件中添加 watch 监听 userRealName 属性的变化
         watch: {
             userRealName(newVal) {
                 if (newVal.trim() === '') {

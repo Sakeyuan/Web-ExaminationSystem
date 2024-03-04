@@ -15,4 +15,10 @@ public interface ExamRecordsMapper {
     void updateRecord(ExamRecords studentRecord, int paperId, int studentId, int titleId);
 
     void submitCorrectAnswer(int paperId, int studentId, String titleId, Integer scores);
+
+    void updateFavorite(ExamRecords examRecords);
+
+    List<ExamRecords> getExamRecodsByStudentIdAndFavorite(int studentId);
+
+    void cancelFavorite(int examId);
 }

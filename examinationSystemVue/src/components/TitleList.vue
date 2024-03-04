@@ -1,5 +1,5 @@
 <template>
-    <div v-if="tableData && tableData.length > 0">
+    <div v-if="(tableData && tableData.length > 0) || titleName">
         <div style="padding: 10px 0">
             <el-select v-model="titleTypeFilter" placeholder="题型筛选" class="mr-5">
                 <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">

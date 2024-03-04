@@ -13,4 +13,6 @@ public class ExamRecords {
     @TableField("is_correct")
     private boolean isCorrect;
     private int scores;
+    @TableField("is_favorite")
+    private Boolean isFavorite;
 }

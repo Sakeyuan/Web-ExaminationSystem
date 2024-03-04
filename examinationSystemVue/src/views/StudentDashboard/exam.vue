@@ -74,7 +74,7 @@
                                                 <span v-if="part.slice(0,5) == 'input'" class="inline-div">
                                                     <el-input
                                                         v-model="studentAnswers[sectionIndex][index][part[part.length-1]]"
-                                                        class="custom-input" style="padding: 5px">
+                                                        class="exam-input" style="padding: 5px">
                                                     </el-input>
                                                 </span>
                                                 <span v-else class="question-title inline-div"
@@ -311,12 +311,6 @@
                 this.questions = parsedContent;
             },
             submitAnswers() {
-                const loadingInstance = this.$loading({
-                    lock: true,
-                    text: '提交中，请稍候...',
-                    spinner: 'el-icon-loading',
-                    background: 'rgba(0, 0, 0, 0.7)'
-                });
                 const answersWithIds = [];
                 this.questions.forEach((section, sectionIndex) => {
                     section.contents.forEach((question, index) => {
@@ -332,26 +326,40 @@
                         answersWithIds.push({ titleId: questionId, answer: studentAnswers });
                     });
                 });
+
                 const data = {
                     studentId: parseInt(localStorage.getItem("id")),
                     paperId: this.paper.paperId,
                     answers: answersWithIds
                 }
+
+                const loadingInstance = this.$loading({
+                    lock: true,
+                    text: '正在提交试卷中，请勿操作...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
+
                 this.$api.examObj.submitAnswers(data).then(res => {
-                    setTimeout(() => {
-                        if (res.code == 2000) {
-                            this.$message.success("提交成功");
-                            localStorage.removeItem('paperItem');
+                    if (res.code === 2000) {
+                        localStorage.removeItem('paperItem');
+                        setTimeout(() => {
+                            loadingInstance.close();
                             this.exitFullScreen();
+                            this.$message.success("提交成功");
                             this.$router.push('/student/myPaper');
-                        } else {
+                        }, 5000);
+                    } else {
+                        setTimeout(() => {
+                            loadingInstance.close();
                             this.$message.error(res.message);
-                        }
+                        }, 1000);
+                    }
+                }).catch(error => {
+                    setTimeout(() => {
+                        loadingInstance.close();
+                        this.$message.error(error.message);
                     }, 1000);
-                }).catch((error) => {
-                    this.$message.error(error.message);
-                }).finally(() => {
-                    loadingInstance.close();
                 });
             },
             parseQuestionContent(content) {
@@ -489,16 +497,20 @@
         /* 将内部勾选框设置为圆形 */
     }
 
-    ::v-deep .custom-input .el-input__inner {
-        border-radius: 0px !important;
-        border-top-width: 0px !important;
-        border-left-width: 0px !important;
-        border-right-width: 0px !important;
-        border-bottom-width: 1px !important;
-        margin-left: 7px !important;
-        min-width: 50px;
-        width: 80px;
-        max-width: 500px;
+    .exam-input {
+        width: auto;
+        min-width: 80px;
+        width: 120px;
+        padding: 10px;
+    }
+
+    ::v-deep .exam-input .el-input__inner {
+        background-color: #f3f3f3;
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        border-radius: 0%;
+        border-bottom: 1px solid #000 !important;
     }
 
     .exam-container {

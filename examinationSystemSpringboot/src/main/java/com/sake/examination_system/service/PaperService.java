@@ -4,6 +4,7 @@ import com.sake.examination_system.entity.DTO.CorrectAnswerDTO;
 import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.DTO.PaperAddClassDTO;
 import com.sake.examination_system.entity.DTO.PaperDTO;
+import com.sake.examination_system.entity.ExamRecords;
 import com.sake.examination_system.util.MyResponseEntity;
 
 import java.util.List;
@@ -36,4 +37,10 @@ public interface PaperService {
     MyResponseEntity<Object> getOnePaperWithContentAndScoreAndEmpty(int paperId);
 
     MyResponseEntity<Object> addPaperClass(PaperAddClassDTO paperAddClassDTO);
+
+    MyResponseEntity<Object> favorite(ExamRecords examRecords);
+
+    MyResponseEntity<Object> getFavorite(int studentId);
+
+    MyResponseEntity<Object> cancelFavorite(int examId);
 }

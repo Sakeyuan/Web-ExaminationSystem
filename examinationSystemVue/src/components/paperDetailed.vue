@@ -32,6 +32,12 @@
                                     :max="question.content.scores" :step="1" controls-position="right" class="ml-10"
                                     :disabled=isForbidden :controls=inputNumberControls style="margin: 20px">
                                 </el-input-number>
+                                <div style="display: inline; padding: 5px;" v-if="isStudent">
+                                    <font-awesome-icon class="star-icon"
+                                        :class="{ 'filled': question.content.isFavorite }"
+                                        :icon="question.content.isFavorite ? ['fas', 'star'] : ['far', 'star']"
+                                        @click="toggleFavorite(question)" />
+                                </div>
                             </div>
                         </div>
                         <div v-if="question.titleType === 1">
@@ -55,7 +61,6 @@
                                 </el-checkbox>
                             </el-checkbox-group>
                         </div>
-
                         <div v-else-if="question.titleType === 3">
                             <!-- 判断题 -->
                             <el-radio-group v-model="question.content.studentAnswer" disabled>
@@ -94,6 +99,8 @@
         name: 'exam',
         data() {
             return {
+                isFavorite: false,
+                isStudent: false,
                 paper: {},
                 paperId: 0,
                 studentId: 0,
@@ -107,9 +114,32 @@
             };
         },
         created() {
+            if (this.$store.getters.getUser.role === '学生') {
+                this.isStudent = true;
+            }
+
+            console.log(isStudent);
+        },
+        mounted() {
             this.load();
         },
         methods: {
+            toggleFavorite(question) {
+                const message = question.content.isFavorite ? '已取消收藏' : '已收藏';
+                console.log("question:" + JSON.stringify(question));
+                const data = {
+                    paperId: parseInt(this.paperId),
+                    titleId: question.titleId,
+                    studentId: parseInt(localStorage.getItem('id')),
+                    isFavorite: !question.content.isFavorite,
+                }
+                this.$api.paperObj.favorite(data).then(res => {
+                    if (res.code === 2000) {
+                        question.content.isFavorite = !question.content.isFavorite;
+                        this.$message.success(message);
+                    }
+                })
+            },
             setInputNumberControls(val) {
                 this.inputNumberControls = val;
             },
@@ -129,10 +159,6 @@
                 this.fillTitlePartsCache.set(cacheKey, parts);
                 return parts;
             },
-            submitCorrectResult() {
-
-            },
-
             async load() {
                 this.paperId = this.$route.query.paperId;
                 this.studentId = this.$route.query.studentId;
@@ -178,8 +204,8 @@
                             this.$set(this.correctResult, question.titleId, 0);
                             const answerObj = this.findAnswerByTitleId(question.titleId);
                             question.content.studentScores = answerObj.scores;
+                            question.content.isFavorite = answerObj.isFavorite;
                             if (answerObj) {
-                                // 如果是多选题，将答案转换为数组
                                 question.content.studentAnswer = question.titleType === 2 || question.titleType === 4 ? answerObj.answer.split('、')
                                     : answerObj.answer;
                             }
@@ -251,5 +277,15 @@
     ::v-deep .el-checkbox.is-disabled .el-checkbox__input:not(.is-checked)+.el-checkbox__label {
         color: #333;
         /* 或者设置为默认颜色 */
+    }
+
+    .star-icon {
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .star-icon.filled {
+        color: red;
+        position: relative;
     }
 </style>

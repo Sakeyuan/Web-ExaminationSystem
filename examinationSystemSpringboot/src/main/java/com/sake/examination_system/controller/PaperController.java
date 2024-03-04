@@ -4,6 +4,7 @@ import com.sake.examination_system.entity.DTO.CorrectAnswerDTO;
 import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.DTO.PaperAddClassDTO;
 import com.sake.examination_system.entity.DTO.PaperDTO;
+import com.sake.examination_system.entity.ExamRecords;
 import com.sake.examination_system.service.PaperService;
 import com.sake.examination_system.util.MyResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,5 +86,20 @@ public class PaperController {
     @PostMapping("/addPaperClass")
     public MyResponseEntity<Object> addPaperClass(@RequestBody PaperAddClassDTO paperAddClassDTO){
         return paperService.addPaperClass(paperAddClassDTO);
+    }
+
+    @PostMapping("/favorite")
+    public MyResponseEntity<Object> favorite(@RequestBody ExamRecords examRecords){
+        return paperService.favorite(examRecords);
+    }
+
+    @GetMapping("/getFavorite/{studentId}")
+    public MyResponseEntity<Object> getFavorite(@PathVariable("studentId") int studentId){
+        return paperService.getFavorite(studentId);
+    }
+
+    @DeleteMapping("/cancelFavorite/{examId}")
+    public MyResponseEntity<Object> cancelFavorite(@PathVariable("examId") int examId){
+        return paperService.cancelFavorite(examId);
     }
 }

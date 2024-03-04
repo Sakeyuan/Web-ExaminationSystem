@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -152,6 +153,51 @@ public class TeacherServiceImp implements TeacherService {
         pipeData.add(pipe1Data);
         pipeData.add(pipe2Data);
         return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS",countData.size(),countData,pipeData);
+    }
+
+    @Override
+    public void exportClassStudent(HttpServletResponse httpServletResponse, int classId) throws IOException {
+        List<Integer>classIds  = new ArrayList<>();
+        classIds.add(classId);
+        List<Student> students = studentMapper.getAllStudentInfoByClassId(classIds);
+        List<Map<String, Object>> dataList = new ArrayList<>();
+        for (Student student : students) {
+            Map<String, Object> dataMap = new LinkedHashMap<>();
+            dataMap.put("ID", student.getStudentId());
+            dataMap.put("学号", student.getStudentNumber());
+            dataMap.put("用户名", student.getUser().getUserName());
+            dataMap.put("真名", student.getUser().getUserRealName());
+            dataMap.put("性别", student.getUser().getUserGender());
+            dataMap.put("所属班级", student.getMyClass().getClassName());
+            dataMap.put("邮箱", student.getUser().getUserEmail());
+            dataMap.put("手机", student.getUser().getUserPhone());
+            dataList.add(dataMap);
+        }
+
+        // 创建 ExcelWriter
+        ExcelWriter excelWriter = ExcelUtil.getWriter(true);
+
+        // 设置表头别名
+        excelWriter.addHeaderAlias("ID", "ID").setColumnWidth(1,10);
+        excelWriter.addHeaderAlias("学号", "学号").setColumnWidth(2,20);
+        excelWriter.addHeaderAlias("用户名", "用户名").setColumnWidth(3,15);
+        excelWriter.addHeaderAlias("真名", "真名").setColumnWidth(4,15);
+        excelWriter.addHeaderAlias("性别", "性别").setColumnWidth(5,10);
+        excelWriter.addHeaderAlias("所属班级", "所属班级").setColumnWidth(5,10);
+        excelWriter.addHeaderAlias("邮箱", "邮箱").setColumnWidth(6,35);
+        excelWriter.addHeaderAlias("手机", "手机").setColumnWidth(7,35);
+
+        // 将 dataList 写入 ExcelWriter
+        excelWriter.write(dataList, true);
+
+        // 设置响应头，发送到浏览器
+        httpServletResponse.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
+        String fileName = URLEncoder.encode("学生信息", "UTF-8");
+        httpServletResponse.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+        ServletOutputStream out = httpServletResponse.getOutputStream();
+        excelWriter.flush(out, true);
+        out.close();
+        excelWriter.close();
     }
 
     @Override

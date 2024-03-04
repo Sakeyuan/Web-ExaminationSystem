@@ -81,6 +81,11 @@ const routes = [
     ],
   },
   {
+    path: '/myCollection',
+    name: '收藏',
+    component: () => import('../views/StudentDashboard/myCollection.vue'),
+  },
+  {
     path: '/paperDetailed',
     name: '试卷详情',
     component: () => import('../views/StudentDashboard/paperDetailed.vue'),

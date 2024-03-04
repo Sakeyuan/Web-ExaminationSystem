@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 public class PaperServiceImp implements PaperService {
     @Resource
@@ -288,6 +290,48 @@ public class PaperServiceImp implements PaperService {
         }catch (Exception e){
             throw new ServiceException(CodeNums.ERROR,e.getMessage());
         }
+    }
+
+    @Override
+    public MyResponseEntity<Object> favorite(ExamRecords examRecords) {
+        examRecordsMapper.updateFavorite(examRecords);
+        return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
+    }
+
+    @Override
+    public MyResponseEntity<Object> getFavorite(int studentId) {
+        List<ExamRecords>examRecordsList = examRecordsMapper.getExamRecodsByStudentIdAndFavorite(studentId);
+        List<Integer> titleIds = examRecordsList.stream()
+                .map(ExamRecords::getTitleId)
+                .collect(Collectors.toList());
+        List<Map<String, Object>> titleMaps = titleMapper.getTitleById(titleIds);
+        Gson gson = new Gson();
+        List<Title>titles = new ArrayList<>();
+        for (Map<String, Object> titleMap : titleMaps) {
+            Title title = new Title();
+            title.setTitleId((int) titleMap.get("title_id"));
+            title.setTitleType(TitleTypeEnum.getDescriptionByCode((int)titleMap.get("title_type")));
+
+            // 格式化时间戳为年-月-日
+            Timestamp timestamp = (Timestamp) titleMap.get("title_create_stamp");
+
+            title.setTitleCreateStamp(SakeUtil.getFormatTime(timestamp));       // 设置为格式化后的日期字符串
+
+            title.setTeacherId((int) titleMap.get("teacher_id"));
+
+            String titleContentJson = (String) titleMap.get("title_content");
+            TitleDTO titleDTO = gson.fromJson(titleContentJson, TitleDTO.class);
+
+            title.setTitleContent(titleDTO);
+            titles.add(title);
+        }
+        return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS", 1,titles,examRecordsList);
+    }
+
+    @Override
+    public MyResponseEntity<Object> cancelFavorite(int examId) {
+        examRecordsMapper.cancelFavorite(examId);
+        return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
     }
 
     @Override

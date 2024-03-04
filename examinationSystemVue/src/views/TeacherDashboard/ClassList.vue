@@ -16,16 +16,19 @@
         </div>
 
         <el-table :data="tableData" border :header-cell-class-name="tableTitle"
-            @selection-change="handleSelectionChange" empty-text="请先创建班级">
-            <el-table-column type="selection" width="40"></el-table-column>
-            <el-table-column prop="className" label="班级名称"></el-table-column>
-            <el-table-column prop="classCode" label="班级代码"></el-table-column>
-            <el-table-column prop="studentNumbers" label="班级人数" width="80"></el-table-column>
+            @selection-change="handleSelectionChange" empty-text="暂无数据">
+            <el-table-column type="selection" width="40px"></el-table-column>
+            <el-table-column prop="className" label="班级名称" width="200px"></el-table-column>
+            <el-table-column prop="classCode" label="班级代码" width="270px"></el-table-column>
+            <el-table-column prop="studentNumbers" label="班级人数" width="80px"></el-table-column>
 
             <el-table-column prop="operate" label="操作">
                 <template slot-scope="scope">
                     <el-button type="primary" @click="inviteStudent(scope.row.classId,scope.row.className)">
                         邀请学生加入班级<i class="el-icon-plus" style="margin-left: 2px"></i>
+                    </el-button>
+                    <el-button type="primary" @click="exportClassStudent(scope.row.classId)">
+                        导出班级学生<i class="el-icon-upload2" style="margin-left: 2px"></i>
                     </el-button>
                     <el-button type="danger" @click="showDeleteDialog(scope.row.classId)">
                         解散班级<i class="el-icon-delete" style="margin-left: 2px"></i>
@@ -149,6 +152,10 @@
             this.uploadUrl = `${UPLOAD_BASE_URL}/teacher/importStudentInfo`;
         },
         methods: {
+            exportClassStudent(classId) {
+                const url = `${UPLOAD_BASE_URL}/teacher/exportClassStudent?classId=${classId}`;
+                window.open(url);
+            },
             invite() {
                 const data = {
                     classId: this.classId,

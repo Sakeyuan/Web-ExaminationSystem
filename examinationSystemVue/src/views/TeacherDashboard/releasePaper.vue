@@ -176,6 +176,7 @@
                         required: true,
                     }],
                     examTotalTime: [
+                        { required: true, trigger: 'blur' },
                         { validator: validateExamTotalTime, trigger: 'blur' }
                     ],
                     checkedClass: [

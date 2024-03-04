@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public interface TeacherService {
     void exportInfo(HttpServletResponse httpServletResponse,int id) throws IOException;
@@ -19,4 +20,6 @@ public interface TeacherService {
     MyResponseEntity<Object> singleInvite(SingleInviteDTO studentInfo);
 
     MyResponseEntity<Object> getHomeData(HttpServletRequest request);
+
+    void exportClassStudent(HttpServletResponse httpServletResponse, int classId) throws IOException;
 }
