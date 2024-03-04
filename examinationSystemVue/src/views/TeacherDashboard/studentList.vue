@@ -26,25 +26,18 @@
 
             <el-table-column prop="operate" label="操作">
                 <template slot-scope="scope">
-                    <el-button type="danger" @click="showDeleteDialog(scope.row.studentId)">
-                        移出班级<i class="el-icon-delete" style="margin-left: 2px"></i>
-                    </el-button>
+                    <el-popconfirm title="是否移除班级" @confirm="removeStudentFromClass(scope.row.studentId)">
+                        <el-button type="danger" slot="reference">移出班级<i class="el-icon-delete"
+                                style="margin-left: 2px"></i></el-button>
+                    </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
 
-        <el-dialog title="移出班级" :visible.sync="oneDialogVisible" width="30%">
-            <span>是否删除</span>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="oneDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="removeStudentFromClass">确 定</el-button>
-            </span>
-        </el-dialog>
-
         <el-dialog title="批量移出班级" :visible.sync="batchDialogVisible" width="30%">
-            <span>是否批量删除用户</span>
+            <span>是否批量移出班级</span>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button @click="batchDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="batchRemoveStudentFromClass">确 定</el-button>
             </span>
         </el-dialog>
@@ -72,8 +65,6 @@
                 tableData: [],
                 total: 0,
                 tableTitle: 'tableTitle',
-                studentIdToRemove: 0,
-                oneDialogVisible: false,
                 batchDialogVisible: false,
                 multipleSelection: []
             }
@@ -81,19 +72,19 @@
         watch: {
             userRealName(newVal) {
                 if (newVal.trim() === '') {
-                    this.load(); // 如果搜索框为空，加载数据
+                    this.load(); 
                 } else {
-                    this.handleSearch(); // 执行搜索操作
+                    this.handleSearch(); 
                 }
             },
         },
         methods: {
             handleSearch() {
                 if (this.userRealName.trim()) {
-                    this.load();                // 如果搜索框有内容，执行搜索
+                    this.load();                
                 } else {
-                    this.userRealName = '';     // 清空搜索框
-                    this.load();                // 如果搜索框为空，加载数据
+                    this.userRealName = '';    
+                    this.load();                
                 }
             },
             exp() {
@@ -102,9 +93,6 @@
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
-            },
-            batchRemoveStudentFromClass() {
-
             },
             batchRemoveStudentFromClass() {
                 this.batchDialogVisible = false;
@@ -119,25 +107,21 @@
                     this.load();
                 })
             },
-            showDeleteDialog(studentId) {
-                // 设置要删除的用户 ID，并显示删除对话框
-                this.studentIdToRemove = studentId;
-                this.oneDialogVisible = true;
-            },
             showBatchDelById() {
+                if (this.multipleSelection.length == 0) {
+                    this.$message("请选择学生");
+                    return;
+                }
                 this.batchDialogVisible = true;
             },
-            removeStudentFromClass() {
-                // 发送删除请求
-                this.$api.studentObj.removeStudentFromClass(this.studentIdToRemove).then(res => {
+            removeStudentFromClass(studentId) {
+                this.$api.studentObj.removeStudentFromClass(studentId).then(res => {
                     if (res.code == 2000) {
                         this.$message.success("移除成功");
                     }
                     else {
                         this.$message.error(res.message);
                     }
-                    this.oneDialogVisible = false;
-                    this.studentIdToRemove = 0;
                     this.load();
                 })
             },

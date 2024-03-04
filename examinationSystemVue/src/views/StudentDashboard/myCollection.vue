@@ -122,9 +122,11 @@
                 try {
                     const res = await this.$api.paperObj.getFavorite(parseInt(localStorage.getItem('id')));
                     if (res.code === 2000) {
-                        this.titles = res.data;
-                        this.studentAnswers = res.other;
-                        await this.handleTitle();
+                        if (res.data) {
+                            this.titles = res.data;
+                            this.studentAnswers = res.other;
+                            await this.handleTitle();
+                        }
                     } else {
                         this.$message({
                             type: 'error',

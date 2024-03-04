@@ -30,20 +30,13 @@
                     <el-button type="primary" @click="exportClassStudent(scope.row.classId)">
                         导出班级学生<i class="el-icon-upload2" style="margin-left: 2px"></i>
                     </el-button>
-                    <el-button type="danger" @click="showDeleteDialog(scope.row.classId)">
-                        解散班级<i class="el-icon-delete" style="margin-left: 2px"></i>
-                    </el-button>
+                    <el-popconfirm title="是否解散该班级班级" style="margin-left: 5px" @confirm="removeClass(scope.row.classId)">
+                        <el-button type="danger" slot="reference">解散班级<i class="el-icon-delete"></i></el-button>
+                    </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
 
-        <el-dialog title="解散班级" :visible.sync="oneDialogVisible" width="30%">
-            <span>是否解散该班级</span>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="oneDialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="removeClass">确 定</el-button>
-            </span>
-        </el-dialog>
 
         <el-dialog title="创建班级" :visible.sync="createClassDialogVisible" style="width: 800px">
             <el-form :model="form">
@@ -132,7 +125,6 @@
                 total: 0,
                 tableTitle: 'tableTitle',
                 userIdToDelete: 0,
-                oneDialogVisible: false,
                 batchDialogVisible: false,
                 createClassDialogVisible: false,
                 uploadUrl: '',
@@ -289,23 +281,18 @@
                     this.load();
                 })
             },
-            showDeleteDialog(classId) {
-                this.classId = classId;
-                this.oneDialogVisible = true;
-            },
             showBatchDelById() {
                 this.batchDialogVisible = true;
 
             },
-            removeClass() {
-                this.$api.classObj.removeClass(this.classId).then(res => {
+            removeClass(classId) {
+                this.$api.classObj.removeClass(classId).then(res => {
                     if (res.code == 2000) {
                         this.$message.success("解散成功");
                     }
                     else {
                         this.$message.error(res.message);
                     }
-                    this.oneDialogVisible = false;
                     this.userIdToDelete = 0;
                     this.load();
                 })

@@ -11,6 +11,15 @@ const routes = [
     component: () => import('../views/test.vue'),
   },
   {
+    path: '*',
+    redirect: '/404'
+  },
+  {
+    path: '/404',
+    name: '404',
+    component: () => import('../views/404/404.vue'),
+  },
+  {
     path: '/setPassword',
     name: 'setPassword',
     component: () => import('../views/ForgetPassword/setPassword.vue'),
@@ -253,7 +262,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => { 
   const token = localStorage.getItem('token') || null;
-  if (to.path !== '/' && !token && to.path !== '/register' && to.path !== '/register/student-register' && to.path !== '/register/teacher-register' && to.path !== '/forgot-password' && to.path !== '/test' && to.path !== '/setPassword') { 
+  if (to.path !== '/' && !token && to.path !== '/register' && to.path !== '/register/student-register' && to.path !== '/register/teacher-register' && to.path !== '/forgot-password' && to.path !== '/test' && to.path !== '/setPassword' && to.path !== '/404') { 
     next('/'); 
   }
   else if (to.path === '/' && token) {

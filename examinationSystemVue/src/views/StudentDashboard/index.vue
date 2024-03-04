@@ -75,9 +75,6 @@
                             console.error(res.message);
                         }
                     })
-                    .catch(err => {
-                        console.error('Error loading image:', err);
-                    });
             },
             handleCommand(command) {
                 switch (command) {

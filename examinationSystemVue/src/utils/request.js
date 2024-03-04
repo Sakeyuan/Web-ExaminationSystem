@@ -1,78 +1,124 @@
 import router from '@/router';
-import axios from 'axios'
-import { Message } from 'element-ui'; // 引入 Message 组件
+import axios from 'axios';
+import { Message } from 'element-ui';
 import store from '@/store';
 import api from '@/api';
 import { serverIp } from '../../public/config';
 
 const instance = axios.create({
-  baseURL: `http://${serverIp}:9090`,  // 使用反引号（`）进行模板字符串
+  baseURL: `http://${serverIp}:9090`,
   timeout: 30000
-});
-
-
-instance.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    return config
-}, error => {
-    return Promise.reject(error)
 });
 
 let isRefreshing = false;
 let requests = [];
 
+// 请求拦截器
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器
 instance.interceptors.response.use(
-  async response => {
+  async (response) => {
     const { data, config } = response;
+    console.log(response);
     return data;
   },
-  async error => {
-   if(error.code == 'ECONNABORTED' && error.message.indexOf('timeout') != -1 ){
-      Message.error("请求超时，请检查网络连接或稍后重试")
+  async (error) => {
+    console.log(error);
+    if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {
+      // 处理请求超时
+      handleTimeoutError();
       return Promise.reject(error);
-	  }
-    else if (error.response.status === 4003) {
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const res = await api.authObj.refreshToken({ refreshToken: localStorage.getItem('refreshToken') });
-          if (res && res.code === 200) {
-            console.log("token刷新成功");
-            const { data: token, other: refreshToken } = res;
-            store.commit("setToken", token);
-            store.commit("setRefreshToken", refreshToken);
-
-            // 执行之前失败的请求
-            requests.forEach((cb) => cb(token));
-            requests = []; // 清空数组，以便重新执行请求
-
-            // 重新尝试原始请求
-            return instance(error.config);
-          }
-        } catch (error) {
-          console.error("刷新令牌时出错:", error);
-          store.commit("clearUser");
-          router.push('/');
-          return Promise.reject(error);
-        } finally {
-          isRefreshing = false;
-        }
-      }
     }
-    else if (error.response.status === 4001 || error.response.status === 4002) {
-      store.commit('clearUser')
-      router.push('/')
-    }
-    else {
-      return new Promise(resolve => {
-        requests.push(() => resolve(instance(error.config)));
+   else if (error.response && error.response.status && error.response.status === 4003) {
+      // 令牌失效，尝试刷新令牌
+      await handleTokenRefresh(error);
+    } else if (error.response && error.response.status && (error.response.status === 4001 || error.response.status === 4002)) {
+      // 处理用户身份认证错误
+      handleUserAuthenticationError();
+    } else {
+      // 其他错误，加入请求队列以便稍后重试
+      return new Promise((resolve, reject) => {
+        addToQueue((token) => resolve(instance(error.config)));
+        setTimeout(() => reject(error), calculateRetryDelay());
       });
     }
   }
 );
 
-export default instance
+// 处理请求超时
+function handleTimeoutError() {
+  Message.error('请求超时，请检查网络连接或稍后重试');
+}
 
+// 尝试刷新令牌
+async function handleTokenRefresh(error) {
+  if (!isRefreshing) {
+    isRefreshing = true;
+    try {
+      const res = await api.authObj.refreshToken({ refreshToken: localStorage.getItem('refreshToken') });
+      if (res && res.code === 200) {
+        console.log('Token刷新成功');
+        const { data: token, other: refreshToken } = res;
+        store.commit('setToken', token);
+        store.commit('setRefreshToken', refreshToken);
+
+        retryRequest(token);
+        clearQueue();
+
+        return instance(error.config);
+      }
+    } catch (error) {
+      console.error('刷新令牌时出错:', error);
+      handleUserAuthenticationError();
+      return Promise.reject(error);
+    } finally {
+      isRefreshing = false;
+    }
+  }
+}
+
+// 处理用户身份认证错误
+function handleUserAuthenticationError() {
+  store.commit('clearUser');
+  router.push('/');
+}
+
+// 添加请求到队列
+function addToQueue(callback) {
+  requests.push(callback);
+}
+
+// 重新执行队列中的请求
+function retryRequest(token) {
+  requests.forEach((cb) => cb(token));
+}
+
+// 清空请求队列
+function clearQueue() {
+  requests = [];
+}
+
+// 计算重试间隔
+function calculateRetryDelay() {
+  const maxDelay = 3000;
+  const baseDelay = 500;
+
+  const retries = requests.length;
+  const delay = Math.min(baseDelay * Math.pow(2, retries), maxDelay);
+
+  return delay;
+}
+
+export default instance;
