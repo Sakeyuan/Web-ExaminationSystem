@@ -4,7 +4,7 @@
 
     <update id="removeStudentFromClass" parameterType="int">
         UPDATE student
-        SET class_id = 0
+        SET class_id = null
         WHERE student_id = #{studentId}
     </update>
 

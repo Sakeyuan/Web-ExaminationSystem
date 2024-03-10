@@ -136,22 +136,27 @@ public class TeacherServiceImp implements TeacherService {
         int userId = SakeUtil.parseAuthorization(request);
         int teacherId = teacherMapper.getTeacherIdByUserId(userId);
         List<Integer>classIds = classMapper.getClassIdByTeacherId(teacherId);
-        if(classIds.isEmpty()){
-            return new MyResponseEntity<>(CodeNums.SUCCESS,"没有班级");
-        }
-        int studentNumbers = studentMapper.getAllStudentCountsByClassId(classIds);
-        int classNumbers = classIds.size();
         int tileNumbers = titleMapper.getTitlesCountByTeacherId(new PageDTO(teacherId));
-        int paperNumbers = paperMapper.getPaperCountByTeacherId(teacherId);
-        countData.put("studentNumbers",studentNumbers);
-        countData.put("classNumbers",classNumbers);
-        countData.put("titleNumbers",tileNumbers);
-        countData.put("paperNumbers",paperNumbers);
-        List<HashMap<String, Integer>> pipe1Data = studentMapper.getStudentCountsByClassId(classIds);
-        List<HashMap<String, Integer>> pipe2Data = paperClassMapper.getListByTeacherId(teacherId);
         List<List<HashMap<String, Integer>>> pipeData = new ArrayList<>();
-        pipeData.add(pipe1Data);
-        pipeData.add(pipe2Data);
+        if(classIds.isEmpty()){
+            countData.put("titleNumbers",tileNumbers);
+            countData.put("studentNumbers",0);
+            countData.put("classNumbers",0);
+            countData.put("paperNumbers",0);
+        }
+        else{
+            int studentNumbers = studentMapper.getAllStudentCountsByClassId(classIds);
+            int classNumbers = classIds.size();
+            int paperNumbers = paperMapper.getPaperCountByTeacherId(teacherId);
+            countData.put("studentNumbers",studentNumbers);
+            countData.put("classNumbers",classNumbers);
+            countData.put("paperNumbers",paperNumbers);
+            countData.put("titleNumbers",tileNumbers);
+            List<HashMap<String, Integer>> pipe1Data = studentMapper.getStudentCountsByClassId(classIds);
+            List<HashMap<String, Integer>> pipe2Data = paperClassMapper.getListByTeacherId(teacherId);
+            pipeData.add(pipe1Data);
+            pipeData.add(pipe2Data);
+        }
         return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS",countData.size(),countData,pipeData);
     }
 

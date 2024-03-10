@@ -301,6 +301,9 @@ public class PaperServiceImp implements PaperService {
     @Override
     public MyResponseEntity<Object> getFavorite(int studentId) {
         List<ExamRecords>examRecordsList = examRecordsMapper.getExamRecodsByStudentIdAndFavorite(studentId);
+        if(examRecordsList.isEmpty()){
+            return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
+        }
         List<Integer> titleIds = examRecordsList.stream()
                 .map(ExamRecords::getTitleId)
                 .collect(Collectors.toList());
