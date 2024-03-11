@@ -60,7 +60,7 @@
         data() {
             return {
                 pageNum: 1,
-                pageSize: 10,
+                pageSize: 5,
                 userRealName: '',
                 tableData: [],
                 total: 0,
@@ -72,19 +72,19 @@
         watch: {
             userRealName(newVal) {
                 if (newVal.trim() === '') {
-                    this.load(); 
+                    this.load();
                 } else {
-                    this.handleSearch(); 
+                    this.handleSearch();
                 }
             },
         },
         methods: {
             handleSearch() {
                 if (this.userRealName.trim()) {
-                    this.load();                
+                    this.load();
                 } else {
-                    this.userRealName = '';    
-                    this.load();                
+                    this.userRealName = '';
+                    this.load();
                 }
             },
             exp() {

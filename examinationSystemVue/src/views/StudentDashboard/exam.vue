@@ -95,7 +95,7 @@
 
                         </div>
                         <div class="submit-btn">
-                            <el-button size="medium" type="primary" @click="submitAnswers">提交答案</el-button>
+                            <el-button size="medium" type="primary" @click="submitConfirmation">提交答案</el-button>
                         </div>
                     </div>
                     <div v-else>
@@ -104,22 +104,11 @@
                 </el-main>
             </el-container>
         </div>
-        <el-dialog :visible.sync="showExamDialog" title="注意事项" width="60%">
-            <div style="text-align: center; padding: 20px;">
-                <p style="font-size: 16px;">请在考试开始前仔细阅读以下注意事项：</p>
-                <ul style="list-style-type: none; padding: 0; margin-bottom: 20px;">
-                    <li style="font-size: 14px; margin-bottom: 10px;">请确保在稳定的网络环境下参加考试。</li>
-                    <li style="font-size: 14px; margin-bottom: 10px;">禁止使用任何形式的作弊工具。</li>
-                    <li style="font-size: 14px; margin-bottom: 10px;">请在规定时间内完成考试。</li>
-                    <li style="font-size: 14px; margin-bottom: 10px;">不要随意离开考试界面，以免影响考试顺利进行。</li>
-                </ul>
-                <div>
-                    <el-icon name="information" style="font-size: 30px; color: #409EFF;"></el-icon>
-                    <p style="font-size: 14px; margin-top: 10px;">如果有任何疑问，请联系考务人员。</p>
-                </div>
-            </div>
+        <el-dialog v-if="showSubmitConfirmation" :visible.sync="showSubmitConfirmation" title="确认提交答案">
+            <p>您确定要提交答案吗？提交后无法更改。</p>
             <div slot="footer" class="dialog-footer" style="text-align: center;">
-                <el-button @click="confirmExam" type="primary" size="medium">知道了</el-button>
+                <el-button @click="showSubmitConfirmation = false" size="medium">取消</el-button>
+                <el-button @click="submitAnswers" type="primary" size="medium">确定提交</el-button>
             </div>
         </el-dialog>
     </div>
@@ -128,18 +117,22 @@
 <script>
     import "@/styles/exam.css";
     import io from 'socket.io-client';
+    import { serverIp } from '../../../public/config';
+    import { serverPort } from '../../../public/config';
+
     export default {
         name: 'exam',
         data() {
             return {
                 showExamDialog: true,
+                showSubmitConfirmation: false,
                 paper: {},
                 studentAnswers: [],
                 questions: [],
                 fillTitlePartsCache: new Map(),
                 socket: null,
                 localStorageKey: "examRemainingTime",
-                websocketUrl: "ws://localhost:9090/websocket/",
+                websocketUrl: `ws://${serverIp}:${serverPort}/websocket/`,
                 remainingTime: 0,
                 remainingMinutes: 0,
                 timer: null,
@@ -156,9 +149,12 @@
             }
         },
         methods: {
+            submitConfirmation() {
+                this.showSubmitConfirmation = true;
+            },
             confirmExam() {
                 this.showExamDialog = false;
-                this.enterFullScreen();
+
             },
             exitFullScreen() {
                 if (document.exitFullscreen) {
@@ -343,6 +339,7 @@
                 this.$api.examObj.submitAnswers(data).then(res => {
                     if (res.code === 2000) {
                         localStorage.removeItem('paperItem');
+                        localStorage.removeItem('examRemainingTime');
                         setTimeout(() => {
                             loadingInstance.close();
                             this.exitFullScreen();
@@ -422,6 +419,7 @@
             this.initResizeHandler();
             this.loadRemainingTime();
             this.initWebSocket();
+            this.enterFullScreen();
         },
         destroyed() {
             window.removeEventListener('resize', this.debouncedResizeHandler);

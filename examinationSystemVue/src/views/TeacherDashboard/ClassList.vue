@@ -117,7 +117,7 @@
                 formLabelWidth: '70px',
                 dialogVisible: false,
                 pageNum: 1,
-                pageSize: 10,
+                pageSize: 5,
                 className: '',
                 rowClassName: '',
                 classId: 0,

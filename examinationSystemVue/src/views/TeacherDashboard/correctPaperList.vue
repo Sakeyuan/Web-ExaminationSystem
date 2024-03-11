@@ -20,7 +20,7 @@
             <el-table-column prop="studentNumber" label="学号" width="120px" align="center"></el-table-column>
             <el-table-column prop="className" label="所属班级" align="center"></el-table-column>
             <el-table-column prop="paperName" label="试卷名称" align="center"></el-table-column>
-            <el-table-column prop="paperScore" label="试卷总分" align="center"></el-table-column>
+            <el-table-column prop="paperScore" label="试卷总分" align="center" width="80px"></el-table-column>
             <el-table-column :label="'考试时长'" align="center">
                 <template slot-scope="scope">
                     {{ paperTotalTimeInHours[scope.$index] }}

@@ -10,7 +10,7 @@
                                 <h3 class="paper-name-h">{{ item.paperName }}</h3>
                                 <p class="mt-10">分数: {{ item.paperScore }} 分</p>
                                 <p class="mt-5">总时长: {{ paperTotalTimeInHours[papers.indexOf(item)] }}</p>
-                                <el-button class="mt-10" type="primary" size="small" @click="goToExam(item)">
+                                <el-button class="mt-10" type="primary" size="small" @click="startExam(item)">
                                     开始考试</el-button>
                             </div>
                         </el-card>
@@ -30,6 +30,25 @@
         <el-dialog title="人脸识别" :visible.sync="dialogVisible" width="50%" :before-close="handleClose">
             <Camera ref="camera" @sendFile="uploadFile"></Camera>
         </el-dialog>
+        <el-dialog :visible.sync="showExamDialog" title="注意事项" width="60%" center>
+            <div style="text-align: center; padding: 20px;">
+                <p style="font-size: 16px;">请在考试开始前仔细阅读以下注意事项：</p>
+                <ul style="list-style-type: none; padding: 0; margin-bottom: 20px;">
+                    <li style="font-size: 14px; margin-bottom: 10px;">请确保在稳定的网络环境下参加考试。</li>
+                    <li style="font-size: 14px; margin-bottom: 10px;">禁止使用任何形式的作弊工具。</li>
+                    <li style="font-size: 14px; margin-bottom: 10px;">请在规定时间内完成考试。</li>
+                    <li style="font-size: 14px; margin-bottom: 10px;">不要随意离开考试界面，以免影响考试顺利进行。</li>
+                </ul>
+                <div>
+                    <el-icon name="information" style="font-size: 30px; color: #409EFF;"></el-icon>
+                    <p style="font-size: 14px; margin-top: 10px;">如果有任何疑问，请联系考务人员。</p>
+                </div>
+            </div>
+            <div slot="footer" class="dialog-footer" style="text-align: center;">
+                <el-button @click="showExamDialog = false" size="medium">取消</el-button>
+                <el-button @click="goToExam" type="primary" size="medium">确定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -42,12 +61,14 @@
         },
         data() {
             return {
+                showExamDialog: false,
                 pageNum: 1,
                 pageSize: 6,
                 total: 0,
                 papers: [],
                 index: 0,
                 dialogVisible: false,
+                item: null,
             }
         },
         computed: {
@@ -67,16 +88,20 @@
                     done();
                 }
             },
-            goToExam(item) {
-                // this.dialogVisible = true;
-                // this.$nextTick(() => {
-                //     this.$refs.camera.setShowUploadImgBtn(false);
-                // });
-                const itemString = JSON.stringify(item);
+            startExam(item) {
+                this.showExamDialog = true;
+                this.item = item;
+            },
+            goToExam() {
+                this.showExamDialog = false;
+                this.dialogVisible = true;
+                this.$nextTick(() => {
+                    this.$refs.camera.setShowUploadImgBtn(false);
+                });
+                const itemString = JSON.stringify(this.item);
                 const parsedItem = JSON.parse(itemString);
                 localStorage.setItem('paperItem', itemString);
                 localStorage.setItem('examRemainingTime', parsedItem.paperTotalTime);
-                this.$router.push('/exam');
             },
             uploadFile(file) {
                 this.file = file;

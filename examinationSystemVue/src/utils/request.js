@@ -4,9 +4,10 @@ import { Message } from 'element-ui';
 import store from '@/store';
 import api from '@/api';
 import { serverIp } from '../../public/config';
+import { serverPort } from '../../public/config';
 
 const instance = axios.create({
-  baseURL: `http://${serverIp}:9090`,
+  baseURL: `http://${serverIp}:${serverPort}`,
   timeout: 30000
 });
 
