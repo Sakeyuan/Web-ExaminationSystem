@@ -11,7 +11,7 @@
  Target Server Version : 80020
  File Encoding         : 65001
 
- Date: 02/03/2024 10:57:04
+ Date: 11/03/2024 14:38:51
 */
 
 SET NAMES utf8mb4;
@@ -28,7 +28,7 @@ CREATE TABLE `class`  (
   `student_numbers` int(0) NOT NULL DEFAULT 0,
   `teacher_id` int(0) NOT NULL,
   PRIMARY KEY (`class_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for exam_records
@@ -42,11 +42,12 @@ CREATE TABLE `exam_records`  (
   `answer` varchar(800) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `is_correct` tinyint(0) NULL DEFAULT 0,
   `scores` int(0) NULL DEFAULT 0,
+  `is_favorite` tinyint(0) NULL DEFAULT 0,
   PRIMARY KEY (`exam_id`) USING BTREE,
   INDEX `idx_exam_student_paper_title`(`exam_id`, `student_id`, `paper_id`, `title_id`) USING BTREE,
   INDEX `examRecordsForeignKeyPaperId`(`paper_id`) USING BTREE,
   CONSTRAINT `examRecordsForeignKeyPaperId` FOREIGN KEY (`paper_id`) REFERENCES `paper` (`paper_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 58 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 200 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for file
@@ -62,7 +63,7 @@ CREATE TABLE `file`  (
   `file_is_delete` tinyint(1) NULL DEFAULT 0 COMMENT '是否删除',
   `file_enable` tinyint(1) NULL DEFAULT 0 COMMENT '是否禁用',
   PRIMARY KEY (`file_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for paper
@@ -78,7 +79,7 @@ CREATE TABLE `paper`  (
   `is_allow_check` tinyint(0) NOT NULL DEFAULT 0 COMMENT '是否运行查看试卷',
   `teacher_id` int(0) NOT NULL COMMENT '发布试卷的教师ID',
   PRIMARY KEY (`paper_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for paper_class
@@ -91,7 +92,7 @@ CREATE TABLE `paper_class`  (
   PRIMARY KEY (`paper_class_id`) USING BTREE,
   UNIQUE INDEX `uc_paper_class`(`class_id`, `paper_id`) USING BTREE,
   CONSTRAINT `paperClassForeignKeyClassId` FOREIGN KEY (`class_id`) REFERENCES `class` (`class_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for student
@@ -125,7 +126,7 @@ CREATE TABLE `student_paper`  (
   UNIQUE INDEX `uc_student_paper`(`student_id`, `paper_id`) USING BTREE,
   INDEX `studentPaperForeignKeyPaperId`(`paper_id`) USING BTREE,
   CONSTRAINT `studentPaperForeignKeyPaperId` FOREIGN KEY (`paper_id`) REFERENCES `paper` (`paper_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for teacher
@@ -136,7 +137,7 @@ CREATE TABLE `teacher`  (
   `teacher_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '教师工号',
   `user_id` int(0) NOT NULL COMMENT '用户id',
   PRIMARY KEY (`teacher_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for title
@@ -149,7 +150,7 @@ CREATE TABLE `title`  (
   `title_create_stamp` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '创建时间\r\n',
   `teacher_id` int(0) NOT NULL COMMENT '发布题目的ID',
   PRIMARY KEY (`title_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for user
