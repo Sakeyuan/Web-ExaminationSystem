@@ -9,7 +9,6 @@
                             <p>总时间: {{ paper.paperTotalTime }} 分钟</p>
                             <p>总分: {{ paper.paperScore }} 分</p>
                         </div>
-
                     </div>
                     <div class="timer-container">
                         <p :style="{ color: remainingMinutes < 10 ? 'red' : 'white' }">
@@ -92,7 +91,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                         <div class="submit-btn">
                             <el-button size="medium" type="primary" @click="submitConfirmation">提交答案</el-button>

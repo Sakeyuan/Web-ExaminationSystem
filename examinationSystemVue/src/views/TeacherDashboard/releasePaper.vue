@@ -13,7 +13,7 @@
                 </el-switch>
             </el-form-item>
 
-            <el-form-item label="时间设置" prop="examTotalTime" class="mt-30" label-width="80px">
+            <el-form-item label="时间设置(分钟)" prop="examTotalTime" class="mt-30" label-width="120px">
                 <div class="ml-5">
                     <el-slider v-model="ruleForm.examTotalTime" show-input :min="0" :max="500" :step="10" show-stops>
                     </el-slider>
