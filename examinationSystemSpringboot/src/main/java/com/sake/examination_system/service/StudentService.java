@@ -15,4 +15,9 @@ public interface StudentService {
     MyResponseEntity<Object> batchRemoveStudentFromClass(List<Integer> studentIds);
 
     Student getStudentByUserId(int userId);
+
+    List<Integer> getStudentIds(List<Integer> classIds);
+
+
+    Integer getClassIdById(Integer studentId);
 }

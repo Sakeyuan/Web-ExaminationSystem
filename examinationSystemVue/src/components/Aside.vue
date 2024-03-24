@@ -33,6 +33,8 @@
         </el-submenu>
 
         <el-menu-item index="performanceAnalysis"><i class="el-icon-setting"></i><span>成绩分析</span></el-menu-item>
+
+        <el-menu-item index="video"><i class="el-icon-s-platform"></i><span>学生视频</span></el-menu-item>
     </el-menu>
 </template>
 

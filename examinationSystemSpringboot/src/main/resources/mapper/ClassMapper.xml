@@ -84,5 +84,15 @@
         </foreach>
     </select>
 
+    <select id="getClassIdListByTid" resultType="java.lang.Integer">
+        SELECT class_id FROM class
+        WHERE  teacher_id = #{teacherId}
+    </select>
+
+    <select id="getTeacherIdById" resultType="java.lang.Integer">
+        SELECT teacher_id FROM class
+        WHERE class_id = #{classId}
+    </select>
+
 
 </mapper>

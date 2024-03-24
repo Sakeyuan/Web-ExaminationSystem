@@ -30,4 +30,8 @@ public interface ClassMapper {
     Class getClassById(int classId);
 
     List<Integer> getIdSByClassName(List<String> classList);
+
+    List<Integer> getClassIdListByTid(int teacherId);
+
+    Integer getTeacherIdById(Integer classId);
 }

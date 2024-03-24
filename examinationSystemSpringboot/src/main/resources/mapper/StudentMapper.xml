@@ -142,6 +142,15 @@
     </select>
 
 
+    <select id="getIdByClassIds" resultType="java.lang.Integer">
+        SELECT student_id FROM student
+        WHERE student_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </select>
+
+
     <insert id="addStudent" parameterType="com.sake.examination_system.entity.Student" >
         <!-- 插入学生信息，使用插入用户信息得到的 userId 作为外键 -->
         INSERT INTO student (student_number, student_face_id, user_id)

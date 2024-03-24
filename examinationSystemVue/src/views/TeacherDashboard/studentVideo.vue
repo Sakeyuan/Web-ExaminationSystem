@@ -1,14 +1,13 @@
 <template>
     <div id="app">
-        <h1>学生考试视频</h1>
+        <h4>学生考试视频</h4>
         <video-container :videos="videos"></video-container>
     </div>
 </template>
 
 <script>
     import VideoContainer from '@/components/VideoContainer.vue';
-    import { serverIp } from '../../public/config';
-    import { serverPort } from '../../public/config';
+    import { serverIp, serverPort } from '../../../public/config';
 
     export default {
         name: 'Test',
@@ -19,19 +18,21 @@
             return {
                 videos: [],
                 websocketUrl: `ws://${serverIp}:${serverPort}/`,
+                socket: null
             };
         },
         created() {
-            // 建立WebSocket连接
-            const socket = new WebSocket(this.websocketUrl + 'video-stream/teacher/' + localStorage.getItem("userId"));
-
-            // 监听消息事件
-            socket.onmessage = (event) => {
+            this.socket = new WebSocket(this.websocketUrl + 'video-stream/teacher/' + localStorage.getItem("userId"));
+            this.socket.onmessage = (event) => {
                 // 接收到视频数据时处理
                 const videoData = event.data;
                 // 将视频数据添加到 videos 数组中
                 this.videos.push({ url: URL.createObjectURL(new Blob([videoData], { type: 'video/webm' })) });
             };
+        },
+        beforeDestroy() {
+            this.socket.close();
+            this.videos.forEach(video => URL.revokeObjectURL(video.url));
         }
     };
 </script>

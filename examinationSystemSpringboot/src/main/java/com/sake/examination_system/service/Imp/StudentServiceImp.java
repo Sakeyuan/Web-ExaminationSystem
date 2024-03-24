@@ -107,4 +107,16 @@ public class StudentServiceImp implements StudentService {
     public Student getStudentByUserId(int userId) {
         return studentMapper.getStudentByUserId(userId);
     }
+
+    @Override
+    public List<Integer> getStudentIds(List<Integer> classIds) {
+        return studentMapper.getIdByClassIds(classIds);
+    }
+
+    @Override
+    public Integer getClassIdById(Integer studentId) {
+        return studentMapper.getClassIdById(studentId);
+    }
+
+
 }

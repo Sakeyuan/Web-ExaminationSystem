@@ -122,6 +122,14 @@ const routes = [
         },
       },
       {
+        path: 'video',
+        name: '学生视频',
+        component: () => import('../views/TeacherDashboard/studentVideo.vue'),
+        meta: {
+          title: '学生视频',        
+        },
+      },
+      {
         path: 'studentList',
         name: '学生列表',
         component: () => import('../views/TeacherDashboard/studentList.vue'),

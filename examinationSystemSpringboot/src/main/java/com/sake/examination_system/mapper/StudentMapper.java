@@ -42,4 +42,6 @@ public interface StudentMapper {
     Integer getClassIdByNumber(String studentNumber);
 
     List<Integer> getIdByClassId(int classId);
+
+    List<Integer> getIdByClassIds(List<Integer> classIds);
 }

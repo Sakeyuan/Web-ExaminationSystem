@@ -150,4 +150,14 @@ public class ClassServiceImp implements ClassService {
         studentMapper.bowOutClass(SakeUtil.parseAuthorization(request));
         return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
     }
+
+    @Override
+    public List<Integer> getClassIdListByTid(int teacherId) {
+        return classMapper.getClassIdListByTid(teacherId);
+    }
+
+    @Override
+    public Integer getTeacherIdById(Integer classId) {
+        return classMapper.getTeacherIdById(classId);
+    }
 }

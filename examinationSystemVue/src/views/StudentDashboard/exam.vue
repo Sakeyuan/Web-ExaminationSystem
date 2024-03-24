@@ -109,6 +109,10 @@
                 <el-button @click="submitAnswers" type="primary" size="medium">确定提交</el-button>
             </div>
         </el-dialog>
+        <video ref="videoElement" autoplay
+            style="width: 150px; position: absolute; top: 100px; right: 10px; max-width: calc(100% - 20px); max-height: calc(100% - 20px);"
+            disablePictureInPicture></video>
+
     </div>
 </template>
 
@@ -122,37 +126,114 @@
         name: 'exam',
         data() {
             return {
+                dragging: false,
+                offsetX: 0,
+                offsetY: 0,
                 showExamDialog: true,
                 showSubmitConfirmation: false,
                 paper: {},
                 studentAnswers: [],
                 questions: [],
                 fillTitlePartsCache: new Map(),
-                socket: null,
+                socketText: null, // 用于文本数据的WebSocket实例
+                socketVideo: null, // 用于视频数据的WebSocket实例
                 localStorageKey: "examRemainingTime",
-                websocketUrl: `ws://${serverIp}:${serverPort}/websocket/`,
+                websocketUrl: `ws://${serverIp}:${serverPort}/`,
                 remainingTime: 0,
                 remainingMinutes: 0,
                 timer: null,
                 debouncedResizeHandler: null,
                 fillInputValues: {},
+                videoStream: null,
             };
         },
         beforeDestroy() {
             this.destroyResizeHandler();
             localStorage.removeItem(this.localStorageKey);
             clearInterval(this.timer);
-            if (this.socket) {
-                this.socket.close();
+            if (this.socketText) {
+                this.socketText.close();
             }
+            this.destroyVideo();
         },
         methods: {
+            sendVideoData() {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = event => {
+                        // 不再在此处发送视频数据
+                        // 只在捕获到数据时更新视频流
+                    };
+                    mediaRecorder.start();
+                    const sendVideoFrame = () => {
+                        if (this.socketVideo.readyState === WebSocket.OPEN) {
+                            const canvas = document.createElement('canvas');
+                            const video = document.createElement('video');
+                            video.srcObject = stream;
+                            video.onloadedmetadata = () => {
+                                canvas.width = video.videoWidth;
+                                canvas.height = video.videoHeight;
+                                const ctx = canvas.getContext('2d');
+                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                canvas.toBlob(blob => {
+                                    this.socketVideo.send(blob);
+                                }, 'video/webm');
+                                video.play();
+                                requestAnimationFrame(sendVideoFrame);
+                            };
+                        }
+                        else {
+                            console.error("WebSocket connection is not open.");
+                        }
+                    };
+
+                    sendVideoFrame(); // 开始发送视频帧
+                }).catch(error => {
+                    console.error('获取摄像头视频流失败:', error);
+                });
+            },
+
+            destroyVideo() {
+                if (this.mediaRecorder) {
+                    this.mediaRecorder.stop();
+                }
+            },
+            initVideo() {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    this.videoStream = stream;
+                    this.$refs.videoElement.srcObject = stream;
+                    this.makeDraggable();
+                }).catch(error => {
+                    console.error('Error accessing camera:', error);
+                });
+            },
+            makeDraggable() {
+                const videoElement = this.$refs.videoElement;
+                videoElement.addEventListener('mousedown', this.startDrag);
+                document.addEventListener('mousemove', this.drag);
+                document.addEventListener('mouseup', this.stopDrag);
+            },
+            startDrag(event) {
+                this.dragging = true;
+                this.offsetX = event.clientX - this.$refs.videoElement.offsetLeft;
+                this.offsetY = event.clientY - this.$refs.videoElement.offsetTop;
+            },
+            drag(event) {
+                if (this.dragging) {
+                    const newX = event.clientX - this.offsetX;
+                    const newY = event.clientY - this.offsetY;
+                    this.$refs.videoElement.style.left = `${newX}px`;
+                    this.$refs.videoElement.style.top = `${newY}px`;
+                }
+            },
+            stopDrag() {
+                this.dragging = false;
+            },
             submitConfirmation() {
                 this.showSubmitConfirmation = true;
             },
             confirmExam() {
                 this.showExamDialog = false;
-
             },
             exitFullScreen() {
                 if (document.exitFullscreen) {
@@ -236,18 +317,29 @@
                 return `${formatNumber(hours)}:${formatNumber(minutes)}:${formatNumber(seconds)}`;
             },
             initWebSocket() {
-                this.socket = new WebSocket(this.websocketUrl + localStorage.getItem("userId"));
-                this.socket.timeout = setTimeout(() => {
-                    this.socket.close(); // 关闭连接
-                    this.$message.error("WebSocket连接超时，请刷新页面重试或联系管理员");
-                }, (this.remainingTime + 30) * 1000);
+                // 建立WebSocket连接（文本数据）
+                this.socketText = new WebSocket(this.websocketUrl + "websocketSendText/" + localStorage.getItem("userId"));
+                this.socketText.onopen = this.webSocketOnopenText;
+                this.socketText.onmessage = this.webSocketOnmessageText;
+                this.socketText.onerror = this.webSocketOnerrorText;
+                this.socketText.onclose = this.webSocketCloseText;
 
-                this.socket.onopen = this.webSocketOnopen;
-                this.socket.onmessage = this.webSocketOnmessage;
-                this.socket.onerror = this.webSocketOnerror;
-                this.socket.onclose = this.webSocketClose;
+                // 建立WebSocket连接（视频数据）
+                this.socketVideo = new WebSocket(this.websocketUrl + "video-stream/student/" + localStorage.getItem("userId"));
+                this.socketVideo.onopen = this.webSocketOnopenVideo;
+                this.socketVideo.onerror = this.webSocketOnerrorVideo;
+                this.socketVideo.onclose = this.webSocketCloseVideo;
             },
-            webSocketOnopen() {
+            webSocketOnopenVideo() {
+                console.log("发送视频数据");
+                this.sendVideoData();
+            },
+            webSocketOnerrorVideo() {
+            },
+            webSocketCloseVideo() {
+
+            },
+            webSocketOnopenText() {
                 const messageObject = {
                     command: "uploadExamTotalTime",
                     data: {
@@ -258,10 +350,10 @@
                 this.webSocketSend(JSON.stringify(messageObject));
                 this.startTime();
             },
-            webSocketOnerror() {
+            webSocketOnerrorText() {
                 this.$message.error("WebSocket连接发生错误，请刷新页面重试或联系管理员");
             },
-            webSocketOnmessage(event) {
+            webSocketOnmessageText(event) {
                 const data = JSON.parse(event.data);
                 if (data.type === "uploadRemainingTime") {
                     this.remainingTime = data.data.remainingTime;
@@ -270,9 +362,9 @@
             },
             webSocketSend(message) {
                 console.log("WebSocket发送消息:" + message);
-                this.socket.send(message);
+                this.socketText.send(message);
             },
-            webSocketClose(e) {
+            webSocketCloseText(e) {
                 console.log("WebSocket连接已关闭");
             },
             getFillTitleParts(content, sectionIndex, index) {
@@ -304,59 +396,59 @@
                 });
                 this.questions = parsedContent;
             },
-            submitAnswers() {
-                const answersWithIds = [];
-                this.questions.forEach((section, sectionIndex) => {
-                    section.contents.forEach((question, index) => {
-                        const questionId = question.titleId
-                        let studentAnswers = this.studentAnswers[sectionIndex][index];
-                        if (question.titleType === 4) {
-                            for (let i = 0; i < studentAnswers.length; i++) {
-                                if (!studentAnswers[i]) {
-                                    studentAnswers[i] = "";
-                                }
-                            }
-                        }
-                        answersWithIds.push({ titleId: questionId, answer: studentAnswers });
-                    });
-                });
+            // submitAnswers() {
+            //     const answersWithIds = [];
+            //     this.questions.forEach((section, sectionIndex) => {
+            //         section.contents.forEach((question, index) => {
+            //             const questionId = question.titleId
+            //             let studentAnswers = this.studentAnswers[sectionIndex][index];
+            //             if (question.titleType === 4) {
+            //                 for (let i = 0; i < studentAnswers.length; i++) {
+            //                     if (!studentAnswers[i]) {
+            //                         studentAnswers[i] = "";
+            //                     }
+            //                 }
+            //             }
+            //             answersWithIds.push({ titleId: questionId, answer: studentAnswers });
+            //         });
+            //     });
 
-                const data = {
-                    studentId: parseInt(localStorage.getItem("id")),
-                    paperId: this.paper.paperId,
-                    answers: answersWithIds
-                }
+            //     const data = {
+            //         studentId: parseInt(localStorage.getItem("id")),
+            //         paperId: this.paper.paperId,
+            //         answers: answersWithIds
+            //     }
 
-                const loadingInstance = this.$loading({
-                    lock: true,
-                    text: '正在提交试卷中，请勿操作...',
-                    spinner: 'el-icon-loading',
-                    background: 'rgba(0, 0, 0, 0.7)'
-                });
+            //     const loadingInstance = this.$loading({
+            //         lock: true,
+            //         text: '正在提交试卷中，请勿操作...',
+            //         spinner: 'el-icon-loading',
+            //         background: 'rgba(0, 0, 0, 0.7)'
+            //     });
 
-                this.$api.examObj.submitAnswers(data).then(res => {
-                    if (res.code === 2000) {
-                        localStorage.removeItem('paperItem');
-                        localStorage.removeItem('examRemainingTime');
-                        setTimeout(() => {
-                            loadingInstance.close();
-                            this.exitFullScreen();
-                            this.$message.success("提交成功");
-                            this.$router.push('/student/myPaper');
-                        }, 5000);
-                    } else {
-                        setTimeout(() => {
-                            loadingInstance.close();
-                            this.$message.error(res.message);
-                        }, 1000);
-                    }
-                }).catch(error => {
-                    setTimeout(() => {
-                        loadingInstance.close();
-                        this.$message.error(error.message);
-                    }, 1000);
-                });
-            },
+            //     this.$api.examObj.submitAnswers(data).then(res => {
+            //         if (res.code === 2000) {
+            //             localStorage.removeItem('paperItem');
+            //             localStorage.removeItem('examRemainingTime');
+            //             setTimeout(() => {
+            //                 loadingInstance.close();
+            //                 this.exitFullScreen();
+            //                 this.$message.success("提交成功");
+            //                 this.$router.push('/student/myPaper');
+            //             }, 5000);
+            //         } else {
+            //             setTimeout(() => {
+            //                 loadingInstance.close();
+            //                 this.$message.error(res.message);
+            //             }, 1000);
+            //         }
+            //     }).catch(error => {
+            //         setTimeout(() => {
+            //             loadingInstance.close();
+            //             this.$message.error(error.message);
+            //         }, 1000);
+            //     });
+            // },
             parseQuestionContent(content) {
                 try {
                     return JSON.parse(content);
@@ -418,6 +510,10 @@
             this.loadRemainingTime();
             this.initWebSocket();
             this.enterFullScreen();
+            this.initVideo();
+            const videoElement = this.$refs.videoElement;
+            videoElement.style.top = '10px';
+            videoElement.style.right = '10px';
         },
         destroyed() {
             window.removeEventListener('resize', this.debouncedResizeHandler);

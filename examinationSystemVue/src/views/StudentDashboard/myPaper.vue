@@ -93,6 +93,7 @@
                 this.item = item;
             },
             goToExam() {
+                this.$router.push("/exam");
                 this.showExamDialog = false;
                 this.dialogVisible = true;
                 this.$nextTick(() => {

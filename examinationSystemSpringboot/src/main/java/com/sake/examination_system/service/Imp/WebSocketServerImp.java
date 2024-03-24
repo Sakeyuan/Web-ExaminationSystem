@@ -10,8 +10,9 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.util.concurrent.*;
 
+
 @Component
-@ServerEndpoint("/websocket/{userId}")
+@ServerEndpoint("/websocketSendText/{userId}")
 public class WebSocketServerImp  {
     private static ExamService examService;
 
@@ -43,7 +44,6 @@ public class WebSocketServerImp  {
         }
     }
 
-
     @OnMessage
     public void onMessage(String message, Session session) {
         try {
@@ -65,7 +65,8 @@ public class WebSocketServerImp  {
                         else{
                             sendRemainTime(String.valueOf(userId));
                         }
-                    } else {
+                    }
+                    else {
                         // 处理 "examTotalTime" 为空的情况
                         System.out.println("上传的消息中缺少有效的 examTotalTime 值");
                     }
@@ -109,6 +110,7 @@ public class WebSocketServerImp  {
         }
         countdownTasks.remove(userId);
     }
+
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
         try {

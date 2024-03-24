@@ -25,10 +25,14 @@ public interface ClassService {
 
     MyResponseEntity<Object> getAllClassByTid(int id);
 
-
     MyResponseEntity<Object> getClassByToken(HttpServletRequest request);
 
     MyResponseEntity<Object> addClass(HttpServletRequest request, ClassDTO classDTO);
 
     MyResponseEntity<Object> bowOutClass(HttpServletRequest request);
+
+    List<Integer> getClassIdListByTid(int teacherId);
+
+
+    Integer getTeacherIdById(Integer classId);
 }
