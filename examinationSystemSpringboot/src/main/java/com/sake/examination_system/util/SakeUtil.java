@@ -30,6 +30,9 @@ public class SakeUtil {
     private String ip2regionPath = System.getProperty("user.dir") + "/files/ip/";;
     public static final String API_KEY = "oHpW0v4CSOZeXQfixMZ5NZUX";
     public static final String SECRET_KEY = "zqZCq5pJpuKBOeLezOZrxt5rxTJcNXkK";
+    public static final String TEACHER_KEY = "teacherId";
+    public static final String STUDENT_KEY = "studentId";
+
 
     public static String getClientIpByString(String ip) {
         SakeUtil instance = new SakeUtil();

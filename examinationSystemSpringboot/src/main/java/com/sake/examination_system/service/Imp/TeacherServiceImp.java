@@ -32,6 +32,8 @@ public class TeacherServiceImp implements TeacherService {
     @Resource
     StudentMapper studentMapper;
 
+    @Resource
+    RedisServiceImp redisServiceImp;
 
     @Resource
     TeacherMapper teacherMapper;
@@ -203,6 +205,11 @@ public class TeacherServiceImp implements TeacherService {
         excelWriter.flush(out, true);
         out.close();
         excelWriter.close();
+    }
+
+    @Override
+    public MyResponseEntity<Object> getOnlineStudents(String id) {
+        return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS",redisServiceImp.getValue(id + SakeUtil.TEACHER_KEY));
     }
 
     @Override

@@ -11,6 +11,11 @@ const routes = [
     component: () => import('../views/test.vue'),
   },
   {
+    path: '/test2',
+    name: 'test2',
+    component: () => import('../views/test2.vue'),
+  },
+  {
     path: '*',
     redirect: '/404'
   },
@@ -270,7 +275,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => { 
   const token = localStorage.getItem('token') || null;
-  if (to.path !== '/' && !token && to.path !== '/register' && to.path !== '/register/student-register' && to.path !== '/register/teacher-register' && to.path !== '/forgot-password' && to.path !== '/test' && to.path !== '/setPassword' && to.path !== '/404') { 
+  if (to.path !== '/' && !token && to.path !== '/register' && to.path !== '/register/student-register' && to.path !== '/register/teacher-register' && to.path !== '/forgot-password' && to.path !== '/test' && to.path !== '/test2' && to.path !== '/setPassword' && to.path !== '/404') { 
     next('/'); 
   }
   else if (to.path === '/' && token) {

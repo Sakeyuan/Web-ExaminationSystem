@@ -22,7 +22,9 @@ public interface StudentMapper {
     int getStudentIdByPhone(String userPhone);
     Integer removeStudentFromClass(int classId);
     Integer inviteStudentToClass(int classId,String studentNumber);
+
     Integer getClassIdById(int id);
+
     List<Integer> getStudentIdByClassId(Integer classId);
     Student getStudentByUserId(int userId);
 

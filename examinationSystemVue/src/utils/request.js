@@ -7,7 +7,7 @@ import { serverIp } from '../../public/config';
 import { serverPort } from '../../public/config';
 
 const instance = axios.create({
-  baseURL: `http://${serverIp}:${serverPort}`,
+  baseURL: `https://${serverIp}:${serverPort}`,
   timeout: 30000
 });
 
@@ -32,7 +32,6 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   async (response) => {
     const { data, config } = response;
-    console.log(response);
     return data;
   },
   async (error) => {

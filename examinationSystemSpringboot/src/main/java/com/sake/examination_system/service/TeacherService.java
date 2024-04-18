@@ -22,4 +22,6 @@ public interface TeacherService {
     MyResponseEntity<Object> getHomeData(HttpServletRequest request);
 
     void exportClassStudent(HttpServletResponse httpServletResponse, int classId) throws IOException;
+
+    MyResponseEntity<Object> getOnlineStudents(String id);
 }

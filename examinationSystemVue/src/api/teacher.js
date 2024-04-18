@@ -14,6 +14,9 @@ const teacherObj = {
     },
     getHomeData() {
         return http.get(`${TEACHER_STR}/getHomeData`)
+    },
+    getOnlineStudents(params) {
+        return http.get(`${TEACHER_STR}/getOnlineStudents/` + params);
     }
 
 }

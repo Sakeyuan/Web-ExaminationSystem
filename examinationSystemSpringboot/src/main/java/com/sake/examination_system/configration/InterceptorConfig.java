@@ -12,7 +12,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/swagger-ui.html/**","/login/**","/register/**","/file/uploadFace","/files/avatar/**","/auth/refreshToken","/user/sendVerificationCode","/auth/verifyCode","/user/setPassword","/teacher/exportStudentInfo","/teacher/exportClassStudent");
+                .excludePathPatterns("/swagger-ui.html/**","/login/**","/register/**","/file/uploadFace","/files/avatar/**","/auth/refreshToken","/user/sendVerificationCode","/auth/verifyCode","/user/setPassword","/teacher/exportStudentInfo","/teacher/exportClassStudent","**/video-stream/**");
     }
 
     @Bean

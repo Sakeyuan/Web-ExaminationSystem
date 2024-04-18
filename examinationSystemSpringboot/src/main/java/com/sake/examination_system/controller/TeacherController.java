@@ -49,4 +49,10 @@ public class TeacherController {
         return teacherService.getHomeData(request);
     }
 
+    @GetMapping("/getOnlineStudents/{id}")
+    public MyResponseEntity<Object>getOnlineStudents(@PathVariable("id") String id ){
+        return teacherService.getOnlineStudents(id);
+    }
+
+
 }

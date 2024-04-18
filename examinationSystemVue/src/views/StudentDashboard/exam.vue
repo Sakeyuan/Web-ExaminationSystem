@@ -1,6 +1,10 @@
 <template>
     <div class="fullscreen-container">
         <div class="exam-container">
+            <div class="video-container">
+                <video ref="localVideo" disablePictureInPicture autoplay style="width: 150px;height: 150px;"
+                    @mousedown="startDragging" @mousemove="dragging" @mouseup="stopDragging"></video>
+            </div>
             <el-container>
                 <el-header class="exam-header">
                     <div class="header-content">
@@ -109,26 +113,27 @@
                 <el-button @click="submitAnswers" type="primary" size="medium">确定提交</el-button>
             </div>
         </el-dialog>
-        <video ref="videoElement" autoplay
-            style="width: 150px; position: absolute; top: 100px; right: 10px; max-width: calc(100% - 20px); max-height: calc(100% - 20px);"
-            disablePictureInPicture></video>
-
     </div>
 </template>
 
 <script>
     import "@/styles/exam.css";
     import io from 'socket.io-client';
-    import { serverIp } from '../../../public/config';
-    import { serverPort } from '../../../public/config';
+    import { serverIp, serverPort } from '../../../public/config';
 
     export default {
         name: 'exam',
         data() {
             return {
-                dragging: false,
+                isDragging: false,
+                initialX: 0,
+                initialY: 0,
                 offsetX: 0,
                 offsetY: 0,
+                localStream: null,
+                conn: null,
+                id: localStorage.getItem('id'),
+
                 showExamDialog: true,
                 showSubmitConfirmation: false,
                 paper: {},
@@ -138,13 +143,13 @@
                 socketText: null, // 用于文本数据的WebSocket实例
                 socketVideo: null, // 用于视频数据的WebSocket实例
                 localStorageKey: "examRemainingTime",
-                websocketUrl: `ws://${serverIp}:${serverPort}/`,
+                websocketUrl: `wss://${serverIp}:${serverPort}/`,
                 remainingTime: 0,
                 remainingMinutes: 0,
                 timer: null,
                 debouncedResizeHandler: null,
                 fillInputValues: {},
-                videoStream: null,
+
             };
         },
         beforeDestroy() {
@@ -154,80 +159,37 @@
             if (this.socketText) {
                 this.socketText.close();
             }
-            this.destroyVideo();
+            if (this.socketVideo && this.socketVideo.readyState === WebSocket.OPEN) {
+                this.sendMessage({ code: "close", id: this.id, data: { data: "closed" } })
+                this.socketVideo.close();
+            }
+
         },
         methods: {
-            sendVideoData() {
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    const mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorder.ondataavailable = event => {
-                        // 不再在此处发送视频数据
-                        // 只在捕获到数据时更新视频流
-                    };
-                    mediaRecorder.start();
-                    const sendVideoFrame = () => {
-                        if (this.socketVideo.readyState === WebSocket.OPEN) {
-                            const canvas = document.createElement('canvas');
-                            const video = document.createElement('video');
-                            video.srcObject = stream;
-                            video.onloadedmetadata = () => {
-                                canvas.width = video.videoWidth;
-                                canvas.height = video.videoHeight;
-                                const ctx = canvas.getContext('2d');
-                                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                canvas.toBlob(blob => {
-                                    this.socketVideo.send(blob);
-                                }, 'video/webm');
-                                video.play();
-                                requestAnimationFrame(sendVideoFrame);
-                            };
-                        }
-                        else {
-                            console.error("WebSocket connection is not open.");
-                        }
-                    };
-
-                    sendVideoFrame(); // 开始发送视频帧
-                }).catch(error => {
-                    console.error('获取摄像头视频流失败:', error);
-                });
+            startDragging(event) {
+                // 记录鼠标按下时视频元素的初始位置
+                this.initialX = event.clientX;
+                this.initialY = event.clientY;
+                // 记录视频元素的初始位置
+                const rect = this.$refs.localVideo.getBoundingClientRect();
+                this.offsetX = rect.left;
+                this.offsetY = rect.top;
+                // 标记为正在拖动
+                this.isDragging = true;
             },
-
-            destroyVideo() {
-                if (this.mediaRecorder) {
-                    this.mediaRecorder.stop();
+            dragging(event) {
+                if (this.isDragging) {
+                    // 计算鼠标位置相对于初始位置的偏移量
+                    const dx = event.clientX - this.initialX;
+                    const dy = event.clientY - this.initialY;
+                    // 更新视频元素的位置
+                    this.$refs.localVideo.style.left = `${this.offsetX + dx}px`;
+                    this.$refs.localVideo.style.top = `${this.offsetY + dy}px`;
                 }
             },
-            initVideo() {
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    this.videoStream = stream;
-                    this.$refs.videoElement.srcObject = stream;
-                    this.makeDraggable();
-                }).catch(error => {
-                    console.error('Error accessing camera:', error);
-                });
-            },
-            makeDraggable() {
-                const videoElement = this.$refs.videoElement;
-                videoElement.addEventListener('mousedown', this.startDrag);
-                document.addEventListener('mousemove', this.drag);
-                document.addEventListener('mouseup', this.stopDrag);
-            },
-            startDrag(event) {
-                this.dragging = true;
-                this.offsetX = event.clientX - this.$refs.videoElement.offsetLeft;
-                this.offsetY = event.clientY - this.$refs.videoElement.offsetTop;
-            },
-            drag(event) {
-                if (this.dragging) {
-                    const newX = event.clientX - this.offsetX;
-                    const newY = event.clientY - this.offsetY;
-                    this.$refs.videoElement.style.left = `${newX}px`;
-                    this.$refs.videoElement.style.top = `${newY}px`;
-                }
-            },
-            stopDrag() {
-                this.dragging = false;
+            stopDragging() {
+                // 标记停止拖动
+                this.isDragging = false;
             },
             submitConfirmation() {
                 this.showSubmitConfirmation = true;
@@ -316,6 +278,84 @@
                 const formatNumber = (number) => (number < 10 ? `0${number}` : `${number}`);
                 return `${formatNumber(hours)}:${formatNumber(minutes)}:${formatNumber(seconds)}`;
             },
+            async startGetUserMedia() {
+                try {
+                    navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+                        this.localStream = stream;
+                        this.$refs.localVideo.srcObject = this.localStream;
+                        this.initPeerConnection();
+                    })
+                } catch (error) {
+                    console.error('Error starting getUserMedia:', error);
+                }
+            },
+            async sendOffer(studentId) {
+                console.log("send offer")
+                try {
+                    const description = await this.conn.createOffer();
+                    await this.conn.setLocalDescription(description);
+                    const message = { code: 'offer', id: studentId, data: { offer: description } };
+                    this.sendMessage(message);
+                }
+                catch (error) {
+                    console.error('Error sending offer:', error);
+                }
+            },
+            async handleAnswer({ answer }) {
+                try {
+                    await this.conn.setRemoteDescription(answer);
+                } catch (error) {
+                    console.error('Error setting remote description:', error);
+                }
+            },
+            handleSocketMessage(e) {
+                const { code, id, data } = JSON.parse(e.data);
+                switch (code) {
+                    case 'invite':
+                        this.sendOffer(id);
+                        break;
+                    case 'answer':
+                        this.handleAnswer(data);
+                        break;
+                    case 'icecandidate':
+                        this.conn.addIceCandidate(new RTCIceCandidate(data.candidate));
+                        break;
+                    default:
+                        console.warn('Unknown message code:', code);
+                }
+            },
+            async handleSocketOpen() {
+                console.log('WebSocket connection established');
+                await this.startGetUserMedia();
+            },
+            handleSocketError(e) {
+                console.error('WebSocket connection error:', e);
+            },
+            handleIceCandidateError(event) {
+                console.error("Error generating ICE candidate:", event.error); // 记录ICE candidate生成错误
+            },
+            sendMessage(message) {
+                if (this.socketVideo && this.socketVideo.readyState === WebSocket.OPEN) {
+                    this.socketVideo.send(JSON.stringify(message));
+                } else {
+                    console.error('WebSocket connection is not open');
+                }
+            },
+            handleIceCandidate(e) {
+                if (e.candidate) {
+                    const message = { code: 'icecandidate', id: this.id, data: { candidate: e.candidate } };
+                    this.sendMessage(message);
+                }
+                else {
+                    console.log('Candidate is null');
+                }
+            },
+            initPeerConnection() {
+                this.conn = new RTCPeerConnection({});
+                this.localStream.getTracks().forEach(track => this.conn.addTrack(track, this.localStream));
+                this.conn.onicecandidate = this.handleIceCandidate;
+                this.conn.onicecandidateerror = this.handleIceCandidateError;
+            },
             initWebSocket() {
                 // 建立WebSocket连接（文本数据）
                 this.socketText = new WebSocket(this.websocketUrl + "websocketSendText/" + localStorage.getItem("userId"));
@@ -324,20 +364,10 @@
                 this.socketText.onerror = this.webSocketOnerrorText;
                 this.socketText.onclose = this.webSocketCloseText;
 
-                // 建立WebSocket连接（视频数据）
-                this.socketVideo = new WebSocket(this.websocketUrl + "video-stream/student/" + localStorage.getItem("userId"));
-                this.socketVideo.onopen = this.webSocketOnopenVideo;
-                this.socketVideo.onerror = this.webSocketOnerrorVideo;
-                this.socketVideo.onclose = this.webSocketCloseVideo;
-            },
-            webSocketOnopenVideo() {
-                console.log("发送视频数据");
-                this.sendVideoData();
-            },
-            webSocketOnerrorVideo() {
-            },
-            webSocketCloseVideo() {
-
+                this.socketVideo = new WebSocket(`wss://${serverIp}:${serverPort}/video-stream/student/${localStorage.getItem('id')}`);
+                this.socketVideo.onopen = this.handleSocketOpen;
+                this.socketVideo.onmessage = this.handleSocketMessage;
+                this.socketVideo.onerror = this.handleSocketError;
             },
             webSocketOnopenText() {
                 const messageObject = {
@@ -490,7 +520,6 @@
                     null
                 );
             },
-            // 返回是否按下了全屏键
             keyDown() {
                 return !!document.webkitIsFullScreen || this.fullEle();
             },
@@ -510,10 +539,7 @@
             this.loadRemainingTime();
             this.initWebSocket();
             this.enterFullScreen();
-            this.initVideo();
-            const videoElement = this.$refs.videoElement;
-            videoElement.style.top = '10px';
-            videoElement.style.right = '10px';
+
         },
         destroyed() {
             window.removeEventListener('resize', this.debouncedResizeHandler);
@@ -577,6 +603,14 @@
         width: 100vw;
         overflow: hidden;
     }
+
+    .video-container {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        z-index: 9999;
+    }
+
 
     /* 使用 ::v-deep */
     ::v-deep .el-checkbox .el-checkbox__input {

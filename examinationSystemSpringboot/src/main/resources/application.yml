@@ -1,6 +1,11 @@
 server:
-  port: 9090
-  
+  port: 9092
+  ssl:
+    key-store: classpath:keystore.jks
+    key-store-password: yuanjiafei
+    key-alias: mycert
+    enabled: true
+
 mail:
   sender:
     email: a13100471406@163.com

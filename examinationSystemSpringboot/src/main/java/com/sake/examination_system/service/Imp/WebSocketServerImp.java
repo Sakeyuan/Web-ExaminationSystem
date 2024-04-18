@@ -27,7 +27,7 @@ public class WebSocketServerImp  {
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
     //虽然@Component默认是单例模式的，但springboot还是会为每个websocket连接初始化一个bean，所以可以用一个静态set保存起来。
     //  注：底下WebSocket是当前类名
-    private static CopyOnWriteArraySet<WebSocketServerImp> webSockets =new CopyOnWriteArraySet<>();
+    private static CopyOnWriteArraySet<WebSocketServerImp> webSockets = new CopyOnWriteArraySet<>();
     // 用来存在线连接用户信息
     private static ConcurrentHashMap<String,Session> sessionPool = new ConcurrentHashMap<String,Session>();
     private ConcurrentHashMap<String, ScheduledFuture<?>> countdownTasks = new ConcurrentHashMap<>();
