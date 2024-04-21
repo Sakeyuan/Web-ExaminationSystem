@@ -9,6 +9,8 @@ public class PaperDTO {
     private String paperName;
     private Integer examTotalTime;
     private int isAllowCheck;
+    private int isReleased;
+    private long preReleaseDate;
     private List<Integer> selectedClasses;
     private List<SubheadingData> subheadings;
     private int teacherId;

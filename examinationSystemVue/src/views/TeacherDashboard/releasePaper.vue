@@ -78,7 +78,8 @@
             </el-form-item>
             <el-form-item class="mt-30">
                 <el-button @click="addSubheading" type="primary">添加标题</el-button>
-                <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+                <el-button type="primary" @click="submitForm('ruleForm', 1)">立即发布</el-button>
+                <el-button type="primary" @click="preReleaseDialogVisible = true">预发布</el-button>
                 <el-button @click="resetForm('ruleForm')">重置</el-button>
             </el-form-item>
         </el-form>
@@ -112,6 +113,20 @@
                 <el-button type="primary" @click="getTitleById">确 定</el-button>
             </span>
         </el-dialog>
+        <el-dialog title="预发布日期" :visible.sync="preReleaseDialogVisible" width="30%">
+            <div class="dateBlock">
+                <el-date-picker v-model="preReleaseDate" type="datetime" placeholder="选择日期时间" align="right"
+                    :picker-options="pickerOptions">
+                </el-date-picker>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="onlyStore">只是存储</el-button>
+                <div>
+                    <el-button @click="preReleaseDialogVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="preRelease">确 定</el-button>
+                </div>
+            </span>
+        </el-dialog>
     </div>
     <el-empty v-else description="请先创建班级"></el-empty>
 </template>
@@ -133,6 +148,23 @@
                 }
             };
             return {
+                timestamp: 0,
+                preReleaseDate: '',
+                preReleaseDialogVisible: false,
+                pickerOptions: {
+                    disabledDate(time) {
+                        const dateTime = new Date();
+                        const startDateTime = dateTime.setDate(dateTime.getDate() - 1);
+                        const endDateTime = dateTime.setDate(dateTime.getDate() + 30000); //30000为当前日期之后多少天
+                        return (
+                            time.getTime() < new Date(startDateTime).getTime() ||
+                            time.getTime() > new Date(endDateTime).getTime()
+                        );
+                    },
+                    selectableRange:
+                        //setMinutes,getMinutes限制分 , 年、月、日、时、分、秒同理,+1为数字区间
+                        this.parseTime(new Date().setMinutes(new Date().getMinutes() + 1), "{hh}:{ii}:{ss}") + "- 23:59:00",
+                },
                 labelPosition: 'left',
                 options: [{
                     value: '1',
@@ -190,6 +222,97 @@
             this.loadAllTitle();
         },
         methods: {
+            preSubmitForm(isReleased) {
+                // 显示加载状态
+                const loadingInstance = this.$loading({
+                    text: '创建中...',
+                    fullscreen: true,
+                    spinner: 'el-icon-loading',
+                    lock: true,
+                });
+
+                this.$refs['ruleForm'].validate((valid) => {
+                    if (valid) {
+                        this.ruleForm.subheadings.forEach((subheading, index) => {
+                            if (!subheading.value || subheading.value.trim() === '' || !subheading.hasCardData) {
+                                this.$message.error("提交失败，请检查标题和题目是否存在");
+                                // 关闭加载状态
+                                this.preReleaseDialogVisible = false;
+                                loadingInstance.close();
+                                return;
+                            }
+                            this.handlePaperData(isReleased);
+                        });
+                        this.$api.paperObj.releasePaper(this.paperData).then(res => {
+                            if (res.code == 2000) {
+                                this.preReleaseDialogVisible = false;
+                                this.$message.success("创建成功");
+                            } else {
+                                this.$message.error(res.message);
+                            }
+                            // 关闭加载状态
+                            loadingInstance.close();
+                        })
+                    } else {
+                        console.log('error submit!!');
+                        // 关闭加载状态
+                        loadingInstance.close();
+                        this.preReleaseDialogVisible = false;
+                        return false;
+                    }
+                });
+            },
+            preRelease() {
+                this.timestamp = new Date(this.preReleaseDate).getTime();
+                if (!this.timestamp) {
+                    this.$message.error("请选择预发布日期");
+                    return;
+                }
+                this.preSubmitForm(0);
+            },
+            parseTime(time, pattern) {
+                if (arguments.length === 0 || !time) {
+                    return null
+                }
+                const format = pattern || '{y}-{m}-{d} {h}:{i}:{s}'
+                let date
+                if (typeof time === 'object') {
+                    date = time
+                } else {
+                    if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
+                        time = parseInt(time)
+                    } else if (typeof time === 'string') {
+                        time = time.replace(new RegExp(/-/gm), '/');
+                    }
+                    if ((typeof time === 'number') && (time.toString().length === 10)) {
+                        time = time * 1000
+                    }
+                    date = new Date(time)
+                }
+                const formatObj = {
+                    y: date.getFullYear(),
+                    m: date.getMonth() + 1,
+                    d: date.getDate(),
+                    h: date.getHours(),
+                    i: date.getMinutes(),
+                    s: date.getSeconds(),
+                    a: date.getDay()
+                }
+                const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+                    let value = formatObj[key]
+                    // Note: getDay() returns 0 on Sunday
+                    if (key === 'a') { return ['日', '一', '二', '三', '四', '五', '六'][value] }
+                    if (result.length > 0 && value < 10) {
+                        value = '0' + value
+                    }
+                    return value || 0
+                })
+                return time_str
+            },
+            onlyStore() {
+                this.timestamp = 0;
+                this.preSubmitForm(0);
+            },
             reset() {
                 this.titleName = '';
                 this.titleTypeFilter = '';
@@ -249,7 +372,6 @@
                 this.$api.classObj.getAllClassByTeacherId(localStorage.getItem("id")).then(res => {
                     if (res.code == 2000) {
                         this.classList = res.data;
-                        console.log("classList: " + JSON.stringify(this.classList));
                     }
                     else {
                         this.$message.error(res.message)
@@ -283,7 +405,7 @@
                     return classItem ? classItem.classId : null;
                 });
             },
-            handlePaperData() {
+            handlePaperData(isReleased) {
                 const jsonData = this.ruleForm.subheadings.map((subheading, index) => {
                     const subheadingData = {
                         title: subheading.value,
@@ -296,7 +418,6 @@
                     }
                     return subheadingData;
                 });
-
                 const finalJson = {
                     paperName: this.ruleForm.name,
                     examTotalTime: this.ruleForm.examTotalTime,
@@ -304,19 +425,31 @@
                     subheadings: jsonData,
                     teacherId: parseInt(localStorage.getItem('id')),
                     isAllowCheck: this.ruleForm.isAllowCheck,
+                    isReleased: isReleased,
+                    preReleaseDate: this.timestamp,
                 };
                 this.paperData = finalJson;
             },
 
-            submitForm(formName) {
+            submitForm(formName, isReleased) {
+                // 显示加载状态
+                const loadingInstance = this.$loading({
+                    text: '加载中...',
+                    fullscreen: true,
+                    spinner: 'el-icon-loading',
+                    lock: true,
+                });
+
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.ruleForm.subheadings.forEach((subheading, index) => {
                             if (!subheading.value || subheading.value.trim() === '' || !subheading.hasCardData) {
                                 this.$message.error("提交失败，请检查标题和题目是否存在");
+                                // 关闭加载状态
+                                loadingInstance.close();
                                 return;
                             }
-                            this.handlePaperData();
+                            this.handlePaperData(isReleased);
                         });
                         this.$api.paperObj.releasePaper(this.paperData).then(res => {
                             if (res.code == 2000) {
@@ -324,9 +457,13 @@
                             } else {
                                 this.$message.error(res.message);
                             }
+                            // 关闭加载状态
+                            loadingInstance.close();
                         })
                     } else {
                         console.log('error submit!!');
+                        // 关闭加载状态
+                        loadingInstance.close();
                         return false;
                     }
                 });
@@ -395,3 +532,15 @@
         },
     }
 </script>
+
+<style scoped>
+    .dateBlock {
+        display: flex;
+        justify-content: center;
+    }
+
+    .dialog-footer {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>

@@ -23,6 +23,11 @@ public class PaperController {
         return paperService.releasePaper(paperDTO);
     }
 
+    @PostMapping("/setPaperReleased")
+    public MyResponseEntity<Object>setPaperReleased(@RequestBody Integer paperId){
+        return paperService.setPaperReleased(paperId);
+    }
+
     @PostMapping("/getAllPaperListByTeacherId")
     public MyResponseEntity<Object> getAllPaperListByTeacherId(@RequestBody PageDTO pageDTO) {
         return paperService.getAllPaperListByTeacherId(pageDTO);

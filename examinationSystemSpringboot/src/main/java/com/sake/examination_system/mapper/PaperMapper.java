@@ -26,4 +26,5 @@ public interface PaperMapper {
     int getPaperCountByTeacherId(int teacherId);
 
 
+    void setIsReleased(int paperId);
 }

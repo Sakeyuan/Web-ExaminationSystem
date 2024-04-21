@@ -53,8 +53,10 @@ const paperObj = {
     },
     cancelFavorite(params) { 
         return http.delete(`${PAPER_STR}/cancelFavorite/`+ params)
+    },
+    setPaperReleased(params) {
+        return http.post(`${PAPER_STR}/setPaperReleased`, params)
     }
-    
 }
 
 export default paperObj;

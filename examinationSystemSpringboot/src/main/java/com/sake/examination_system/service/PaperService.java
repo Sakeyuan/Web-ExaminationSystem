@@ -43,4 +43,6 @@ public interface PaperService {
     MyResponseEntity<Object> getFavorite(int studentId);
 
     MyResponseEntity<Object> cancelFavorite(int examId);
+
+    MyResponseEntity<Object> setPaperReleased(Integer paperId);
 }

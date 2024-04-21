@@ -28,6 +28,8 @@ public class Paper {
 
     private boolean isAllowCheck;
 
+    private boolean isReleased;
+
     private int teacherId;
 
     public String getPaperCreateStamp() {

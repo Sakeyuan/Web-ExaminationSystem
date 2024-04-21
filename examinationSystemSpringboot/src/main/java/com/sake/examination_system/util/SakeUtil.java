@@ -26,6 +26,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SakeUtil {
     private String ip2regionPath = System.getProperty("user.dir") + "/files/ip/";;
     public static final String API_KEY = "oHpW0v4CSOZeXQfixMZ5NZUX";
@@ -33,6 +36,20 @@ public class SakeUtil {
     public static final String TEACHER_KEY = "teacherId";
     public static final String STUDENT_KEY = "studentId";
 
+    // 提取字符串中的数字
+    public static int extractNumber(String input) {
+        // 使用正则表达式匹配数字部分
+        Pattern pattern = Pattern.compile("\\d+");
+        Matcher matcher = pattern.matcher(input);
+        // 找到匹配的数字并返回
+        if (matcher.find()) {
+            String numberStr = matcher.group();
+            return Integer.parseInt(numberStr);
+        } else {
+            // 如果未找到匹配的数字，返回一个默认值或者抛出异常，这里返回0作为默认值
+            return 0;
+        }
+    }
 
     public static String getClientIpByString(String ip) {
         SakeUtil instance = new SakeUtil();

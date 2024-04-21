@@ -10,12 +10,15 @@ import com.sake.examination_system.service.PaperService;
 import com.sake.examination_system.util.CodeNums;
 import com.sake.examination_system.util.MyResponseEntity;
 import com.sake.examination_system.util.SakeUtil;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +44,29 @@ public class PaperServiceImp implements PaperService {
     @Resource
     ClassMapper classMapper;
 
+    @Resource
+    RedisServiceImp redisServiceImp;
+
+    private static Set<Integer> preReleasedSet = new ConcurrentSkipListSet<>();
+
+    @Scheduled(fixedRate = 60000) // 60秒 = 1分钟
+    public void checkAndPublishPaper() {
+        for (Integer paperId : preReleasedSet){
+            long PUBLISH_DATE_TIMESTAMP = (long)redisServiceImp.getValue("paperId:" + paperId);
+            long currentTime = System.currentTimeMillis();
+            if (currentTime >= PUBLISH_DATE_TIMESTAMP) {
+                // 如果当前时间大于等于发布日期，就执行发布试卷的操作
+                publishPaper(paperId);
+            }
+        }
+    }
+
+    public void publishPaper(int paperId) {
+       paperMapper.setIsReleased(paperId);
+       redisServiceImp.deleteValue("paper:" + paperId);
+       System.out.println("试卷已发布！");
+    }
+
     @Transactional
     @Override
     public MyResponseEntity<Object> releasePaper(PaperDTO paperDTO) {
@@ -49,6 +75,7 @@ public class PaperServiceImp implements PaperService {
         paper.setPaperTotalTime(totalTime.longValue());
         paper.setPaperName(paperDTO.getPaperName());
         paper.setTeacherId(paperDTO.getTeacherId());
+        paper.setReleased(paperDTO.getIsReleased() == 1);
         paper.setAllowCheck(paperDTO.getIsAllowCheck() == 1);
         try{
             Gson gson = new Gson();
@@ -71,6 +98,12 @@ public class PaperServiceImp implements PaperService {
             paper.setPaperContent(jsonString);
             paperMapper.releasePaper(paper);
             int paperId = paper.getPaperId();
+            preReleasedSet.add(paperId);
+            redisServiceImp.setValue("paperId:"+paperId,paperDTO.getPreReleaseDate());
+            if(paperDTO.getPreReleaseDate() != 0){
+                // 每分钟检查一次是否到达试卷发布日期
+                checkAndPublishPaper();
+            }
             for(Integer classId : paperDTO.getSelectedClasses()){
                 paperClassMapper.addOne(paperId,classId);
             }
@@ -334,6 +367,12 @@ public class PaperServiceImp implements PaperService {
     @Override
     public MyResponseEntity<Object> cancelFavorite(int examId) {
         examRecordsMapper.cancelFavorite(examId);
+        return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
+    }
+
+    @Override
+    public MyResponseEntity<Object> setPaperReleased(Integer paperId) {
+        publishPaper(paperId);
         return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
     }
 

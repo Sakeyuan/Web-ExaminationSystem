@@ -22,8 +22,13 @@
                     {{ paperTotalTimeInHours[scope.$index] }}
                 </template>
             </el-table-column>
-
-            <el-table-column label="发布的班级">
+            <el-table-column prop="paper.paperTotalTime" width="60px" label="试卷是否发布">
+                <template slot-scope="scope">
+                    <el-tag type="success" v-if="scope.row.paper.released">是</el-tag>
+                    <el-tag type="info" v-else>否</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="发布的班级" width="120px">
                 <template slot-scope="scope">
                     <el-tooltip effect="dark">
                         <div>
@@ -40,7 +45,13 @@
             </el-table-column>
             <el-table-column prop="operate" label="操作">
                 <template slot-scope="scope">
-                    <el-button type="primary" size="mini" @click="getPaperDetail(scope.row.paper.paperId)">
+                    <el-popconfirm confirm-button-text='确定' cancel-button-text='取消' icon="el-icon-info" icon-color="red"
+                        title="是否发布该题目？" @confirm="setPaperReleased(scope.row.paper.paperId)">
+                        <el-button slot="reference" type="primary" size="mini" :disabled="scope.row.paper.released"
+                            class="mr-5">发布</el-button>
+                    </el-popconfirm>
+
+                    <el-button type="primary" size="mini" class="ml-2" @click="getPaperDetail(scope.row.paper.paperId)">
                         详情
                     </el-button>
                     <el-button type="primary" size="mini" class="mr-5" @click="paperAddClass(scope.row.paper.paperId)">
@@ -131,6 +142,16 @@
             },
         },
         methods: {
+            setPaperReleased(paperId) {
+                this.$api.paperObj.setPaperReleased(paperId).then(res => {
+                    if (res.code === 2000) {
+                        this.$message.success("发布成功");
+                        this.load();
+                    } else {
+                        this.$message.error("发布失败");
+                    }
+                })
+            },
             addPaperClass() {
                 if (this.addPaperId == 0) {
                     this.$message.warn("请选择试卷");

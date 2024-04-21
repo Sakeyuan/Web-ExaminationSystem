@@ -67,7 +67,6 @@
         LIMIT #{pageDTO.pageNum}, #{pageDTO.pageSize}
     </select>
 
-
     <select id="getCorrectPaperTotal" resultType="java.lang.Integer">
         SELECT COUNT(*)
         FROM paper p
@@ -113,5 +112,4 @@
         </foreach>
         AND is_finish = 1 AND is_correct = 1
     </select>
-
 </mapper>
