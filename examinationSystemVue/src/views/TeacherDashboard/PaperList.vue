@@ -15,20 +15,20 @@
             border>
             <el-table-column type="selection" width="55">
             </el-table-column>
-            <el-table-column prop="paper.paperName" label="试卷名称"></el-table-column>
-            <el-table-column prop="paper.paperCreateStamp" label="创建时间" width="100px"></el-table-column>
-            <el-table-column prop="paper.paperTotalTime" width="100px" label="考试总时长">
+            <el-table-column prop="paper.paperName" label="试卷名称" width="250px"></el-table-column>
+            <el-table-column prop="paper.paperCreateStamp" label="创建时间" width="100px"></el-table-column align="center">
+            <el-table-column prop="paper.paperTotalTime" width="100px" label="考试总时长" align="center">
                 <template slot-scope="scope">
                     {{ paperTotalTimeInHours[scope.$index] }}
                 </template>
             </el-table-column>
-            <el-table-column prop="paper.paperTotalTime" width="60px" label="试卷是否发布">
+            <el-table-column prop="paper.paperTotalTime" width="100px" label="试卷是否发布" align="center">
                 <template slot-scope="scope">
                     <el-tag type="success" v-if="scope.row.paper.released">是</el-tag>
                     <el-tag type="info" v-else>否</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column label="发布的班级" width="120px">
+            <el-table-column label="发布的班级" width="120px" align="center">
                 <template slot-scope="scope">
                     <el-tooltip effect="dark">
                         <div>

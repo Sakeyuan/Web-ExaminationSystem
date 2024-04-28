@@ -34,18 +34,19 @@
                 :rules="{required: true, message: '标题不能为空', trigger: 'blur'}"
                 style="margin-left: 80px;margin-top: 30px;" label-width="80px">
                 <el-row type="flex" align="middle">
-                    <el-col :span="18">
+                    <el-col :span="16">
                         <el-input type="textarea" autosize v-model="subheading.value"></el-input>
                     </el-col>
-                    <el-col :span="6">
+                    <el-col :span="8">
                         <el-button @click.prevent="getTitleList(subheading)" class="ml-5">添加题目</el-button>
+                        <el-button @click.prevent="clearSubheading(subheading)" class="ml-5">清空</el-button>
                         <el-button @click.prevent="removeSubheading(subheading)" class="ml-5">删除</el-button>
                     </el-col>
                 </el-row>
                 <div class="shadow-box mt-30" v-if="subheading.hasCardData">
                     <div v-for="(item, i) in subheading.cardData" :key="i" class="title-item">
                         <div class="title-div">
-                            <div>
+                            <div style="position: relative;">
                                 题目{{ i + 1 }}<span class="colon-separator">:</span> {{ item.titleContent.name }}
                                 <template v-if="item.titleType === '判断题'">
                                     <span class="judge-separator">( )</span>
@@ -53,12 +54,16 @@
                                 <template v-if="item.titleType === '填空题'">
                                     <span class="judge-separator"></span>
                                 </template>
+                                <el-button style="position: absolute; top: 0; right: 0;"
+                                    @click="removeTitle(subheading,i)">删除</el-button>
                             </div>
                             <div class="text item answer-div">
+
                                 <div class="select-input-container">
                                     <template v-if="item.titleType === '单选题' || item.titleType === '多选题'">
                                         <div v-for="(input, index) in item.titleContent.selectInput" :key="index"
                                             class="select-item">
+
                                             <div>
                                                 {{ input.select }}<span class="dot-separator">. </span>{{
                                                 input.content}}
@@ -71,6 +76,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -96,10 +102,10 @@
                 <el-button type="primary" icon="el-icon-refresh" @click="reset">清空</el-button>
             </div>
             <el-table :data="tableData" border :header-cell-class-name="tableTitle"
-                @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="55"></el-table-column>
+                @selection-change="handleSelectionChange" :row-key="getRowKey" ref="multipleTable">
+                <el-table-column type="selection" width="55" :reserve-selection="true"></el-table-column>
                 <el-table-column prop="titleId" label="ID" width="50"></el-table-column>
-                <el-table-column prop="titleType" label="题目类型" width="60px"></el-table-column>
+                <el-table-column prop="titleType" label="题目类型" width="80px"></el-table-column>
                 <el-table-column prop="titleContent.name" label="题干"></el-table-column>
             </el-table>
             <div style="padding: 10px 0">
@@ -180,6 +186,7 @@
                 tableTitle: 'tableTitle',
                 tableData: [],
                 multipleSelection: [],
+                selectedTitle: [],
                 classList: [],
                 checkAll: false,
                 isIndeterminate: true,
@@ -317,6 +324,15 @@
                 this.titleName = '';
                 this.titleTypeFilter = '';
             },
+            getRowKey(row) {
+                return row.titleId;
+            },
+            removeTitle(subheading, i) {
+                subheading.cardData.splice(i, 1);
+                if (subheading.cardData.length === 0) {
+                    subheading.hasCardData = false;
+                }
+            },
             loadAllTitle() {
                 this.$api.titleObj.getAllTitleType().then(res => {
                     if (res.code == 2000) {
@@ -366,6 +382,14 @@
                 const index = this.ruleForm.subheadings.indexOf(item);
                 if (index !== -1) {
                     this.ruleForm.subheadings.splice(index, 1);
+                }
+            },
+            clearSubheading(item) {
+                const index = this.ruleForm.subheadings.indexOf(item);
+                if (index !== -1) {
+                    this.ruleForm.subheadings[index].hasCardData = false;
+                    this.ruleForm.subheadings[index].cardData = [];
+                    this.$refs.multipleTable.clearSelection();
                 }
             },
             getAllClassByTeacherId() {
@@ -430,7 +454,6 @@
                 };
                 this.paperData = finalJson;
             },
-
             submitForm(formName, isReleased) {
                 // 显示加载状态
                 const loadingInstance = this.$loading({
@@ -468,9 +491,12 @@
                     }
                 });
             },
-
             resetForm(formName) {
                 this.$refs[formName].clearValidate();
+                this.ruleForm.name = '';
+                this.ruleForm.examTotalTime = '';
+                this.ruleForm.isAllowCheck = false;
+
                 this.checkAll = false;
                 this.isIndeterminate = false;
                 this.ruleForm.checkedClass = [];
@@ -480,7 +506,6 @@
                     subheading.cardData = [];
                 });
             },
-
             handleSizeChange(pageSize) {
                 this.pageSize = pageSize;
                 this.load();
@@ -517,16 +542,16 @@
         watch: {
             titleName(newVal) {
                 if (newVal.trim() === '') {
-                    this.load(); // 如果搜索框为空，加载数据
+                    this.load();
                 } else {
-                    this.handleSearch(); // 执行搜索操作
+                    this.handleSearch();
                 }
             },
             titleTypeFilter(newVal) {
                 if (newVal.trim() === '') {
-                    this.load(); // 如果搜索框为空，加载数据
+                    this.load();
                 } else {
-                    this.handleSearch(); // 执行搜索操作
+                    this.handleSearch();
                 }
             },
         },

@@ -426,59 +426,59 @@
                 });
                 this.questions = parsedContent;
             },
-            // submitAnswers() {
-            //     const answersWithIds = [];
-            //     this.questions.forEach((section, sectionIndex) => {
-            //         section.contents.forEach((question, index) => {
-            //             const questionId = question.titleId
-            //             let studentAnswers = this.studentAnswers[sectionIndex][index];
-            //             if (question.titleType === 4) {
-            //                 for (let i = 0; i < studentAnswers.length; i++) {
-            //                     if (!studentAnswers[i]) {
-            //                         studentAnswers[i] = "";
-            //                     }
-            //                 }
-            //             }
-            //             answersWithIds.push({ titleId: questionId, answer: studentAnswers });
-            //         });
-            //     });
+            submitAnswers() {
+                const answersWithIds = [];
+                this.questions.forEach((section, sectionIndex) => {
+                    section.contents.forEach((question, index) => {
+                        const questionId = question.titleId
+                        let studentAnswers = this.studentAnswers[sectionIndex][index];
+                        if (question.titleType === 4) {
+                            for (let i = 0; i < studentAnswers.length; i++) {
+                                if (!studentAnswers[i]) {
+                                    studentAnswers[i] = "";
+                                }
+                            }
+                        }
+                        answersWithIds.push({ titleId: questionId, answer: studentAnswers });
+                    });
+                });
 
-            //     const data = {
-            //         studentId: parseInt(localStorage.getItem("id")),
-            //         paperId: this.paper.paperId,
-            //         answers: answersWithIds
-            //     }
+                const data = {
+                    studentId: parseInt(localStorage.getItem("id")),
+                    paperId: this.paper.paperId,
+                    answers: answersWithIds
+                }
 
-            //     const loadingInstance = this.$loading({
-            //         lock: true,
-            //         text: '正在提交试卷中，请勿操作...',
-            //         spinner: 'el-icon-loading',
-            //         background: 'rgba(0, 0, 0, 0.7)'
-            //     });
+                const loadingInstance = this.$loading({
+                    lock: true,
+                    text: '正在提交试卷中，请勿操作...',
+                    spinner: 'el-icon-loading',
+                    background: 'rgba(0, 0, 0, 0.7)'
+                });
 
-            //     this.$api.examObj.submitAnswers(data).then(res => {
-            //         if (res.code === 2000) {
-            //             localStorage.removeItem('paperItem');
-            //             localStorage.removeItem('examRemainingTime');
-            //             setTimeout(() => {
-            //                 loadingInstance.close();
-            //                 this.exitFullScreen();
-            //                 this.$message.success("提交成功");
-            //                 this.$router.push('/student/myPaper');
-            //             }, 5000);
-            //         } else {
-            //             setTimeout(() => {
-            //                 loadingInstance.close();
-            //                 this.$message.error(res.message);
-            //             }, 1000);
-            //         }
-            //     }).catch(error => {
-            //         setTimeout(() => {
-            //             loadingInstance.close();
-            //             this.$message.error(error.message);
-            //         }, 1000);
-            //     });
-            // },
+                this.$api.examObj.submitAnswers(data).then(res => {
+                    if (res.code === 2000) {
+                        localStorage.removeItem('paperItem');
+                        localStorage.removeItem('examRemainingTime');
+                        setTimeout(() => {
+                            loadingInstance.close();
+                            this.exitFullScreen();
+                            this.$message.success("提交成功");
+                            this.$router.push('/student/myPaper');
+                        }, 5000);
+                    } else {
+                        setTimeout(() => {
+                            loadingInstance.close();
+                            this.$message.error(res.message);
+                        }, 1000);
+                    }
+                }).catch(error => {
+                    setTimeout(() => {
+                        loadingInstance.close();
+                        this.$message.error(error.message);
+                    }, 1000);
+                });
+            },
             parseQuestionContent(content) {
                 try {
                     return JSON.parse(content);
