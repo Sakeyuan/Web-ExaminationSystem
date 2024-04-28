@@ -20,6 +20,12 @@ const titleObj = {
     },
     getAllTitleType() {
         return http.get(`${TITLE_STR}/getAllTitleType`);
+    },
+    getMaxNumTitle(params) {
+        return http.get(`${TITLE_STR}/getMaxNumTitle/` + params);
+    },
+    randomReleaseTitle(params) {
+        return http.post(`${TITLE_STR}/randomReleaseTitle`,params);
     }
 }
 

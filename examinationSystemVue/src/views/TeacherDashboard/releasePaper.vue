@@ -34,11 +34,12 @@
                 :rules="{required: true, message: '标题不能为空', trigger: 'blur'}"
                 style="margin-left: 80px;margin-top: 30px;" label-width="80px">
                 <el-row type="flex" align="middle">
-                    <el-col :span="16">
+                    <el-col :span="14">
                         <el-input type="textarea" autosize v-model="subheading.value"></el-input>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="10">
                         <el-button @click.prevent="getTitleList(subheading)" class="ml-5">添加题目</el-button>
+                        <el-button @click="openRandomTitle(subheading)">随机题目</el-button>
                         <el-button @click.prevent="clearSubheading(subheading)" class="ml-5">清空</el-button>
                         <el-button @click.prevent="removeSubheading(subheading)" class="ml-5">删除</el-button>
                     </el-col>
@@ -133,8 +134,25 @@
                 </div>
             </span>
         </el-dialog>
+        <el-dialog title="随机数量" :visible.sync="randomReleaseDialogVisible" width="30%">
+            <span slot="footer" class="dialog-footer">
+                <el-input-number v-model="randomNum" controls-position="right" :min="1"
+                    :max="maxNumTitle"></el-input-number>
+                <el-button @click="randomReleaseDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="randomReleaseTitle">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog title="试卷发布" :visible.sync="confirmReleaseDialog" width="30%" :before-close="handleClose">
+            <span>试卷重复率超过 <span class="percentage-highlight">80%</span> 是否继续发布</span>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="confirmReleaseDialog = false">取消</el-button>
+                <el-button type="primary" @click="releasePaper">确定</el-button>
+            </span>
+        </el-dialog>
+
     </div>
-    <el-empty v-else description="请先创建班级"></el-empty>
+    <el-empty v-else description=" 请先创建班级"></el-empty>
 </template>
 <script>
     import "@/styles/createTitle.css";
@@ -154,6 +172,10 @@
                 }
             };
             return {
+                confirmReleaseDialog: false,
+                maxNumTitle: 0,
+                randomNum: 1,
+                randomReleaseDialogVisible: false,
                 timestamp: 0,
                 preReleaseDate: '',
                 preReleaseDialogVisible: false,
@@ -226,13 +248,60 @@
         },
         mounted() {
             this.getAllClassByTeacherId();
+            this.getMaxNumTitle();
             this.loadAllTitle();
         },
         methods: {
+            openRandomTitle(subheading) {
+                this.subheadingTmp = subheading;
+                this.randomReleaseDialogVisible = true;
+            },
+            randomReleaseTitle() {
+                const loadingInstance = this.$loading({
+                    text: '随机分配题目中...',
+                    fullscreen: true,
+                    spinner: 'el-icon-loading',
+                    lock: true,
+                });
+                const data = {
+                    teacherId: parseInt(localStorage.getItem('id')),
+                    randomNum: this.randomNum,
+                }
+                this.$api.titleObj.randomReleaseTitle(data).then(res => {
+                    if (res.code == 2000) {
+
+                        this.currentSubheadingIndex = this.ruleForm.subheadings.indexOf(this.subheadingTmp);
+                        if (this.currentSubheadingIndex !== -1) {
+                            this.ruleForm.subheadings[this.currentSubheadingIndex].hasCardData = true;
+                            this.ruleForm.subheadings[this.currentSubheadingIndex].cardData = [
+                                ...res.data
+                            ];
+                            this.$message.success("题目随机分配成功");
+                        }
+                        else {
+                            console.log("currentSubheadingIndex is -1");
+                        }
+                        this.randomReleaseDialogVisible = false;
+                        loadingInstance.close();
+                    } else {
+                        this.$message.error("题目随机分配失败");
+                        loadingInstance.close();
+                    }
+                });
+            },
+            getMaxNumTitle() {
+                this.$api.titleObj.getMaxNumTitle(localStorage.getItem('id')).then(res => {
+                    if (res.code == 2000) {
+                        this.maxNumTitle = res.data;
+                    } else {
+                        this.$message.error(res.message);
+                    }
+                });
+            },
             preSubmitForm(isReleased) {
                 // 显示加载状态
                 const loadingInstance = this.$loading({
-                    text: '创建中...',
+                    text: '加载中...',
                     fullscreen: true,
                     spinner: 'el-icon-loading',
                     lock: true,
@@ -250,16 +319,15 @@
                             }
                             this.handlePaperData(isReleased);
                         });
-                        this.$api.paperObj.releasePaper(this.paperData).then(res => {
+                        this.$api.paperObj.checkRepetition(this.paperData).then(res => {
                             if (res.code == 2000) {
-                                this.preReleaseDialogVisible = false;
-                                this.$message.success("创建成功");
+                                this.confirmReleaseDialog = true;
                             } else {
-                                this.$message.error(res.message);
+                                this.releasePaper();
                             }
-                            // 关闭加载状态
+                        }).finally(() => {
                             loadingInstance.close();
-                        })
+                        });
                     } else {
                         console.log('error submit!!');
                         // 关闭加载状态
@@ -474,15 +542,15 @@
                             }
                             this.handlePaperData(isReleased);
                         });
-                        this.$api.paperObj.releasePaper(this.paperData).then(res => {
+                        this.$api.paperObj.checkRepetition(this.paperData).then(res => {
                             if (res.code == 2000) {
-                                this.$message.success("创建成功");
+                                this.confirmReleaseDialog = true;
                             } else {
-                                this.$message.error(res.message);
+                                this.releasePaper();
                             }
-                            // 关闭加载状态
+                        }).finally(() => {
                             loadingInstance.close();
-                        })
+                        });
                     } else {
                         console.log('error submit!!');
                         // 关闭加载状态
@@ -491,10 +559,30 @@
                     }
                 });
             },
+            releasePaper() {
+                if (this.confirmReleaseDialog) {
+                    this.confirmReleaseDialog = false;
+                }
+                const loadingInstance = this.$loading({
+                    text: '试卷创建中...',
+                    fullscreen: true,
+                    spinner: 'el-icon-loading',
+                    lock: true,
+                });
+                this.$api.paperObj.releasePaper(this.paperData).then(res => {
+                    if (res.code == 2000) {
+                        this.$message.success("创建成功");
+                    } else {
+                        this.$message.error(res.message);
+                    }
+                }).finally(() => {
+                    loadingInstance.close();
+                });
+            },
             resetForm(formName) {
                 this.$refs[formName].clearValidate();
                 this.ruleForm.name = '';
-                this.ruleForm.examTotalTime = '';
+                this.ruleForm.examTotalTime = 0;
                 this.ruleForm.isAllowCheck = false;
 
                 this.checkAll = false;
@@ -567,5 +655,12 @@
     .dialog-footer {
         display: flex;
         justify-content: space-between;
+    }
+
+    .percentage-highlight {
+        color: red;
+        /* 设置文本颜色为红色 */
+        font-weight: bold;
+        /* 设置文本为粗体 */
     }
 </style>

@@ -56,6 +56,9 @@ const paperObj = {
     },
     setPaperReleased(params) {
         return http.post(`${PAPER_STR}/setPaperReleased`, params)
+    },
+    checkRepetition(params) {
+        return http.post(`${PAPER_STR}/checkRepetition`, params)
     }
 }
 
