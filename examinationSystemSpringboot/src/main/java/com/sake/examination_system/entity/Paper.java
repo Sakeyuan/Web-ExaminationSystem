@@ -18,6 +18,7 @@ public class Paper {
     private int paperId;
 
     private String paperName;
+
     private Long paperTotalTime;
 
     private String  paperContent;

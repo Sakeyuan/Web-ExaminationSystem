@@ -1,6 +1,7 @@
 package com.sake.examination_system.controller;
 
 import com.sake.examination_system.entity.DTO.PageDTO;
+import com.sake.examination_system.entity.DTO.RandomTitleDTO;
 import com.sake.examination_system.entity.DTO.TitleDTO;
 import com.sake.examination_system.service.TitleService;
 import com.sake.examination_system.util.MyResponseEntity;
@@ -43,5 +44,15 @@ public class TitleController {
     @GetMapping("/getAllTitleType")
     public MyResponseEntity<Object> getAllTitleType(){
         return titleService.getAllTitleType();
+    }
+
+    @GetMapping("/getMaxNumTitle/{id}")
+    public  MyResponseEntity<Object>getMaxNumTitle(@PathVariable("id") int id){
+        return titleService.getMaxNumTitle(id);
+    }
+
+    @PostMapping("/randomReleaseTitle")
+    public  MyResponseEntity<Object>randomReleaseTitle(@RequestBody RandomTitleDTO randomTitleDTO){
+        return titleService.randomReleaseTitle(randomTitleDTO);
     }
 }

@@ -133,7 +133,6 @@
                 localStream: null,
                 conn: null,
                 id: localStorage.getItem('id'),
-
                 showExamDialog: true,
                 showSubmitConfirmation: false,
                 paper: {},

@@ -10,8 +10,11 @@ import com.sake.examination_system.service.PaperService;
 import com.sake.examination_system.util.CodeNums;
 import com.sake.examination_system.util.MyResponseEntity;
 import com.sake.examination_system.util.SakeUtil;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import io.swagger.models.auth.In;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,7 @@ import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,25 +51,78 @@ public class PaperServiceImp implements PaperService {
     @Resource
     RedisServiceImp redisServiceImp;
 
+    @Resource
+    private TaskScheduler taskScheduler;
+
+    private ScheduledFuture<?> taskFuture;
+
     private static Set<Integer> preReleasedSet = new ConcurrentSkipListSet<>();
 
+    @Async
     @Scheduled(fixedRate = 60000) // 60秒 = 1分钟
-    public void checkAndPublishPaper() {
+    public void startTask() {
+        if (preReleasedSet.isEmpty() && taskFuture != null) {
+            System.out.println("停止定时任务");
+            taskFuture.cancel(true); // 停止定时任务
+            return;
+        }
         for (Integer paperId : preReleasedSet){
             long PUBLISH_DATE_TIMESTAMP = (long)redisServiceImp.getValue("paperId:" + paperId);
             long currentTime = System.currentTimeMillis();
             if (currentTime >= PUBLISH_DATE_TIMESTAMP) {
                 // 如果当前时间大于等于发布日期，就执行发布试卷的操作
                 publishPaper(paperId);
+                System.out.println(paperId + "试卷已发布！");
             }
         }
     }
 
+    public void startScheduler() {
+        Runnable task = this::startTask;
+        taskFuture = taskScheduler.schedule(task, new CronTrigger("0 * * * * *")); // 每分钟执行一次
+    }
+
     public void publishPaper(int paperId) {
        paperMapper.setIsReleased(paperId);
-       redisServiceImp.deleteValue("paper:" + paperId);
-       System.out.println("试卷已发布！");
+       releasePaperToStudent(paperId);
+       redisServiceImp.deleteValue("paperId:" + paperId);
+       preReleasedSet.remove(paperId);
     }
+
+    /**
+     * 计算三年内试卷的题目重复率
+     * @param paperDTO
+     * @param IntersectionRate
+     * @return
+     */
+    private Boolean matchPaperRepeatRate(PaperDTO paperDTO,double IntersectionRate){
+        List<Integer> totalIdList1 =  new ArrayList<>();
+        for (PaperDTO.SubheadingData  subheadingData : paperDTO.getSubheadings()){
+            List<Integer> idList =  subheadingData.getIds();
+            totalIdList1.addAll(idList);
+        }
+        List<Paper> allPapers = paperMapper.getAllPaperByTeacherIdLimitDate(paperDTO.getTeacherId());
+        for (Paper paper : allPapers) {
+            List<PaperDTO.SubheadingData> subheadingDataList = (List<PaperDTO.SubheadingData>) paper.getPaperContent();
+            List<Integer> totalIdList2 =  new ArrayList<>();
+            for (PaperDTO.SubheadingData  subheadingData : subheadingDataList){
+                List<Integer> idList =  subheadingData.getIds();
+                totalIdList2.addAll(idList);
+            }
+            // 计算交集
+            List<Integer> intersection = new ArrayList<>(totalIdList1);
+            intersection.retainAll(totalIdList2);
+
+            // 计算交集率
+            double intersectionRate = (double) intersection.size() / Math.min(totalIdList1.size(), totalIdList2.size()) * 100;
+
+            if(intersectionRate > IntersectionRate){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     @Transactional
     @Override
@@ -98,15 +155,20 @@ public class PaperServiceImp implements PaperService {
             paper.setPaperContent(jsonString);
             paperMapper.releasePaper(paper);
             int paperId = paper.getPaperId();
-            preReleasedSet.add(paperId);
-            redisServiceImp.setValue("paperId:"+paperId,paperDTO.getPreReleaseDate());
-            if(paperDTO.getPreReleaseDate() != 0){
-                // 每分钟检查一次是否到达试卷发布日期
-                checkAndPublishPaper();
-            }
+            //预发布
+
             for(Integer classId : paperDTO.getSelectedClasses()){
                 paperClassMapper.addOne(paperId,classId);
             }
+
+            if(paperDTO.getPreReleaseDate() != 0){
+                preReleasedSet.add(paperId);
+                redisServiceImp.setValue("paperId:"+paperId,paperDTO.getPreReleaseDate());
+                // 每分钟检查一次是否到达试卷发布日期
+                startScheduler();
+                return  new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
+            }
+
             StudentPaper studentPaper = new StudentPaper();
             List<Integer> classIdList = paperDTO.getSelectedClasses();
 
@@ -124,6 +186,19 @@ public class PaperServiceImp implements PaperService {
         return  new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
     }
 
+
+    private void releasePaperToStudent(int paperId){
+        StudentPaper studentPaper = new StudentPaper();
+        List<Integer> classIdList = paperClassMapper.getClassIds(paperId);
+        studentPaper.setPaperId(paperId);
+        for (Integer classId : classIdList){
+            List<Integer> studentIdList = studentMapper.getStudentIdByClassId(classId);
+            for(Integer studentId : studentIdList){
+                studentPaper.setStudentId(studentId);
+                studentPaperMapper.addPaper(studentPaper);
+            }
+        }
+    }
 
     @Override
     public MyResponseEntity<Object> getAllPaperListByTeacherId(PageDTO pageDTO) {
@@ -374,6 +449,16 @@ public class PaperServiceImp implements PaperService {
     public MyResponseEntity<Object> setPaperReleased(Integer paperId) {
         publishPaper(paperId);
         return new MyResponseEntity<>(CodeNums.SUCCESS, "SUCCESS");
+    }
+
+    @Override
+    public MyResponseEntity<Object> checkRepetition(PaperDTO paperDTO) {
+        if(matchPaperRepeatRate(paperDTO,0.8)){
+            return new MyResponseEntity<>(CodeNums.SUCCESS, "重复率大于 80% ");
+        }
+        else {
+            return new MyResponseEntity<>(CodeNums.ERROR, "重复率小于 80%");
+        }
     }
 
     @Override

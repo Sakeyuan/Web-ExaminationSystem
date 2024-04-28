@@ -35,8 +35,9 @@
         </if>
     </select>
 
-    <select id="getAllPaper" resultType="com.sake.examination_system.entity.Paper">
+    <select id="getAllPaperByTeacherIdLimitDate" resultType="com.sake.examination_system.entity.Paper">
         SELECT * FROM paper
+        WHERE paper_create_stamp >= DATE_SUB(CURRENT_DATE(), INTERVAL 3 YEAR) AND teacher_id = #{teacherId}
     </select>
 
     <select id="getAllPaperByPage" resultType="com.sake.examination_system.entity.Paper">

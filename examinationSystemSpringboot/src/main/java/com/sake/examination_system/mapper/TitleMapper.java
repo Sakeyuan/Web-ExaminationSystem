@@ -21,4 +21,8 @@ public interface TitleMapper {
     List<Map<String, Object>> getTitleById(List<Integer> idList);
 
     List<Integer> getAllTitleType();
+
+    Integer getMaxNumTitle(int id);
+
+    List<Integer> getTitleIds(int teacherId);
 }

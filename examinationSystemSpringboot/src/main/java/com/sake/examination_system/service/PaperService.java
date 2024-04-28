@@ -45,4 +45,6 @@ public interface PaperService {
     MyResponseEntity<Object> cancelFavorite(int examId);
 
     MyResponseEntity<Object> setPaperReleased(Integer paperId);
+
+    MyResponseEntity<Object> checkRepetition(PaperDTO paperDTO);
 }

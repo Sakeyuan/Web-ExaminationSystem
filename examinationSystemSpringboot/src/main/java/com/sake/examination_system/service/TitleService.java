@@ -1,6 +1,7 @@
 package com.sake.examination_system.service;
 
 import com.sake.examination_system.entity.DTO.PageDTO;
+import com.sake.examination_system.entity.DTO.RandomTitleDTO;
 import com.sake.examination_system.entity.DTO.TitleDTO;
 import com.sake.examination_system.util.MyResponseEntity;
 
@@ -19,4 +20,8 @@ public interface TitleService {
     MyResponseEntity<Object> getTitleById(List<Integer> idList);
 
     MyResponseEntity<Object> getAllTitleType();
+
+    MyResponseEntity<Object> getMaxNumTitle(int id);
+
+    MyResponseEntity<Object> randomReleaseTitle(RandomTitleDTO randomTitleDTO);
 }

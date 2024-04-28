@@ -23,6 +23,11 @@ public class PaperController {
         return paperService.releasePaper(paperDTO);
     }
 
+    @PostMapping("/checkRepetition")
+    public MyResponseEntity<Object> checkRepetition(@RequestBody PaperDTO paperDTO) {
+        return paperService.checkRepetition(paperDTO);
+    }
+
     @PostMapping("/setPaperReleased")
     public MyResponseEntity<Object>setPaperReleased(@RequestBody Integer paperId){
         return paperService.setPaperReleased(paperId);

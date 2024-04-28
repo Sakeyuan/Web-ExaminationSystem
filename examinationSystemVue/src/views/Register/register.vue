@@ -27,7 +27,7 @@
                         </div>
 
                         <div class="input-group flex" style="margin-top: 15px">
-                            <router-link to="/login" class="forgot">
+                            <router-link to="/" class="forgot">
                                 <i class="el-icon-user-solid mr-2"></i>登录
                             </router-link>
                             <router-link to="/forgot-password" class="forgot">

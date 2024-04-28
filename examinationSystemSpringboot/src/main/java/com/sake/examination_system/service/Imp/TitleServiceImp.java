@@ -1,6 +1,7 @@
 package com.sake.examination_system.service.Imp;
 
 import com.sake.examination_system.entity.DTO.PageDTO;
+import com.sake.examination_system.entity.DTO.RandomTitleDTO;
 import com.sake.examination_system.entity.DTO.TitleDTO;
 import com.sake.examination_system.entity.TitleTypeEnum;
 import com.sake.examination_system.entity.Title;
@@ -14,10 +15,7 @@ import com.google.gson.Gson;
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TitleServiceImp implements TitleService {
@@ -114,5 +112,19 @@ public class TitleServiceImp implements TitleService {
             mySet.add(TitleTypeEnum.getDescriptionByCode(titleType));
         }
         return new MyResponseEntity<Object>(CodeNums.SUCCESS,"",mySet.size(),mySet);
+    }
+
+    @Override
+    public MyResponseEntity<Object> getMaxNumTitle(int id) {
+        Integer maxNum = titleMapper.getMaxNumTitle(id);
+        return new MyResponseEntity<Object>(CodeNums.SUCCESS,"",maxNum);
+    }
+
+    @Override
+    public MyResponseEntity<Object> randomReleaseTitle(RandomTitleDTO randomTitleDTO) {
+        List<Integer> titleIds = titleMapper.getTitleIds(randomTitleDTO.getTeacherId());
+        Collections.shuffle(titleIds);
+        List<Integer> randomElements = titleIds.subList(0, Math.min(randomTitleDTO.getRandomNum(), titleIds.size()));
+        return getTitleById(randomElements);
     }
 }

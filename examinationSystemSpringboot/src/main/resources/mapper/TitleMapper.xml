@@ -44,4 +44,14 @@
         SELECT title_type FROM title
     </select>
 
+    <select id="getMaxNumTitle" resultType="java.lang.Integer">
+        SELECT COUNT(*)  FROM title
+        WHERE teacher_id = #{id}
+    </select>
+
+    <select id="getTitleIds" resultType="java.lang.Integer">
+        SELECT title_id  FROM title
+        WHERE teacher_id = #{teacherId}
+    </select>
+
 </mapper>

@@ -17,14 +17,13 @@ public interface PaperMapper {
 
     Integer deletePaperById(int id);
 
-    List<Paper>getAllPaper();
+    List<Paper>getAllPaperByTeacherIdLimitDate(int teacherId);
 
     List<Paper> getAllPaperByPage(List<Integer>paperList,PageDTO pageDTO);
 
     List<Paper>getPaperById(List<Integer> paperIdList);
 
     int getPaperCountByTeacherId(int teacherId);
-
 
     void setIsReleased(int paperId);
 }
