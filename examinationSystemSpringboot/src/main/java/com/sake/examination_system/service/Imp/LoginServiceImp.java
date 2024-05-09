@@ -33,7 +33,6 @@ public class LoginServiceImp implements LoginService {
     @Override
     public MyResponseEntity<Object> login(LoginDTO loginDTO) {
         MyResponseEntity<Object> r = new MyResponseEntity<Object>();
-
         if(checkPhoneIsExist(loginDTO.getUserPhone()) == 0){
             return new MyResponseEntity<Object>(CodeNums.ERROR,"用户不存在");
         }

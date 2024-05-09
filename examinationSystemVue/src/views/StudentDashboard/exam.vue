@@ -153,6 +153,7 @@
         },
         beforeDestroy() {
             this.destroyResizeHandler();
+            this.stopCameraStream();
             localStorage.removeItem(this.localStorageKey);
             clearInterval(this.timer);
             if (this.socketText) {
@@ -162,7 +163,6 @@
                 this.sendMessage({ code: "close", id: this.id, data: { data: "closed" } })
                 this.socketVideo.close();
             }
-
         },
         methods: {
             startDragging(event) {
@@ -203,6 +203,11 @@
                     document.webkitExitFullscreen();
                 } else if (document.msExitFullscreen) {
                     document.msExitFullscreen();
+                }
+            },
+            stopCameraStream() {
+                if (this.localStream) {
+                    this.localStream.getTracks().forEach(track => track.stop());
                 }
             },
             initResizeHandler() {
@@ -538,7 +543,6 @@
             this.loadRemainingTime();
             this.initWebSocket();
             this.enterFullScreen();
-
         },
         destroyed() {
             window.removeEventListener('resize', this.debouncedResizeHandler);
