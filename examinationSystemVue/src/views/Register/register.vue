@@ -107,10 +107,10 @@
                         }
                     }
                     else {
-                        this.$message("注册失败：" + res.message);
+                        this.$message.error("注册失败：" + res.message);
                     }
                 }).catch(error => {
-                    this.$message("注册失败" + error.message);
+                    this.$message.error("注册失败" + error.message);
                 });
             }
         }

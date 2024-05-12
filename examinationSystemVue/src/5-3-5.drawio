@@ -1,0 +1,95 @@
+<mxfile host="65bd71144e" scale="1" border="20">
+    <diagram id="CX3G9Xh7dB3GCvSDx5av" name="第 1 页">
+        <mxGraphModel dx="967" dy="571" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="280" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" target="279">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="146" y="247" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="277" value="用户填写邮箱" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="86" y="187" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="282" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="279" target="281">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="279" value="点击发送验证码" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="86" y="281" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="285" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="281" target="284">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="281" value="后端获取邮箱号" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="86" y="384" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="289" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="284" target="288">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="284" value="生成随机验证码&lt;br&gt;并存储到Redis" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="86" y="482" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="292" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="287" target="291">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="287" value="用户获取并输入验证码" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="299" y="187" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="290" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;" edge="1" parent="1" source="288" target="287">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="266" y="627"/>
+                            <mxPoint x="266" y="217"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="288" value="发送用户邮箱" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="86" y="597" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="294" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="291" target="293">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="291" value="点击确认" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="299" y="281" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="300" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="293" target="299">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="293" value="后端获取用户发送过来的验证码和邮箱" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="299" y="384" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="302" value="" style="edgeStyle=none;html=1;strokeColor=#000000;" edge="1" parent="1" source="299" target="301">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="299" value="从Redis获取指定验证码比对" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="303" y="482" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="304" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;" edge="1" parent="1" source="301" target="303">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="305" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#000000;rounded=0;" edge="1" parent="1" source="301" target="277">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="363" y="714"/>
+                            <mxPoint x="23" y="714"/>
+                            <mxPoint x="23" y="217"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="301" value="校验验证码" style="rhombus;whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="323" y="580" width="80" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="303" value="跳转设置密码界面" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="496" y="590" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="306" value="&lt;font color=&quot;#000000&quot;&gt;YES&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="419" y="597" width="42" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="307" value="NO" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="669" width="36" height="26" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
