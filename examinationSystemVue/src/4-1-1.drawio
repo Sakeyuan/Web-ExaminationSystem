@@ -1,13 +1,13 @@
 <mxfile host="65bd71144e" scale="1" border="20">
     <diagram id="CX3G9Xh7dB3GCvSDx5av" name="第 1 页">
-        <mxGraphModel dx="288" dy="314" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+        <mxGraphModel dx="532" dy="314" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="2" value="用户界面显示&lt;br&gt;（Vue框架）" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="2" value="用户界面显示&lt;br&gt;（Vue框架）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#333333;" parent="1" vertex="1">
                     <mxGeometry x="31" y="137" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="业务逻辑处理&lt;br&gt;（SpringBoot）" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                <mxCell id="3" value="业务逻辑处理&lt;br&gt;（SpringBoot）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
                     <mxGeometry x="261" y="137" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="4" value="前端应用" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;" parent="1" vertex="1">
@@ -31,7 +31,7 @@
                         <mxPoint x="448" y="167" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="19" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
+                <mxCell id="19" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#FFFFFF;fontColor=#333333;strokeColor=#666666;" parent="1" vertex="1">
                     <mxGeometry x="449" y="127" width="60" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="20" value="数据库" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#000000;" parent="1" vertex="1">

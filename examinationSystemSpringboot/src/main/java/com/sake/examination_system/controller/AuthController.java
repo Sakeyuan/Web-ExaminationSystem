@@ -30,6 +30,4 @@ public class AuthController {
     public MyResponseEntity<String> verifyCode(@RequestBody EmailCodeDTO emailCodeDTO){
         return authService.verifyCode(emailCodeDTO);
     }
-
-
 }
