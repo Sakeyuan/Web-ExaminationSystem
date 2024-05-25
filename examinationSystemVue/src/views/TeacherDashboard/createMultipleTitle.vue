@@ -160,15 +160,20 @@
                 this.ruleForm = {
                     name: '',
                     scores: 1,
-                    type: [],
-                    resource: '',
+                    type: 2,
+                    checkAll: false,
+                    isIndeterminate: true,
                     selectInput: [
                         { id: '1', select: 'A', content: '' },
                         { id: '2', select: 'B', content: '' },
                         { id: '3', select: 'C', content: '' },
                         { id: '4', select: 'D', content: '' },
                     ],
+                    answer: '',
+                    teacherId: 0,
                 };
+                this.selectedAnswers = [];
+                this.$forceUpdate();
             },
 
         }

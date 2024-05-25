@@ -140,8 +140,7 @@
                 this.ruleForm = {
                     name: '',
                     scores: 1,
-                    type: [],
-                    resource: '',
+                    type: 1,
                     selectInput: [
                         { id: '1', select: 'A', content: '' },
                         { id: '2', select: 'B', content: '' },
@@ -150,6 +149,7 @@
                     ],
                     answer: '',
                 };
+                this.$forceUpdate();
             },
 
         }

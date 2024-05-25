@@ -92,8 +92,22 @@
                 });
             },
             resetForm(formName) {
-                // 重置表单验证信息
                 this.$refs[formName].clearValidate();
+                this.ruleForm = {
+                    name: '',
+                    scores: 1,
+                    type: 3,
+                    options: [{
+                        value: 'true',
+                        label: '正确'
+                    }, {
+                        value: 'false',
+                        label: '错误    '
+                    }],
+                    answer: '',
+                    teacherId: 0,
+                };
+                this.$forceUpdate();
             },
 
         }

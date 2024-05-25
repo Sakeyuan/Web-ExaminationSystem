@@ -81,8 +81,15 @@
                 });
             },
             resetForm(formName) {
-                // 重置表单验证信息
                 this.$refs[formName].clearValidate();
+                this.ruleForm = {
+                    name: '',
+                    scores: 1,
+                    type: 4,
+                    answer: '',
+                    teacherId: 0,
+                };
+                this.$forceUpdate();
             },
 
         }
