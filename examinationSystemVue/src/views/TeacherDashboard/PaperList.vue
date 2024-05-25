@@ -105,7 +105,7 @@
         data() {
             return {
                 pageNum: 1,
-                pageSize: 10,
+                pageSize: 5,
                 paperName: '',
                 tableData: [],
                 total: 0,
@@ -180,9 +180,12 @@
                     if (res.code == 2000) {
                         this.classList = res.data.map(classItem => {
                             // 添加一个属性 isPublished，表示该班级是否已发布
-                            classItem.isPublished = this.tableData.some(paper => paper.classList.some(c => c.classId === classItem.classId));
+                            classItem.isPublished = this.tableData.some(paper => {
+                                return paper.classList.some(c => c.classId === classItem.classId) && paper.paper.paperId === this.addPaperId;
+                            });
                             return classItem;
                         });
+                        console.log(JSON.stringify(this.classList))
                     }
                     else {
                         this.$message.error(res.message)

@@ -201,7 +201,7 @@
                     this.$message.error('请上传Excel文件');
                 }
                 this.needInviteStudent = [];
-                return isExcel; // Returns true to allow uploading if it's an Excel file
+                return isExcel;
             },
             inviteStudent(classId, rowClassName) {
                 this.inviteStudentDialogVisible = true;

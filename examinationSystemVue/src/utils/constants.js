@@ -1,3 +1,3 @@
-import { serverIp } from '../../public/config';
+import { serverIp,serverPort } from '../../public/config';
 
-export const UPLOAD_BASE_URL = `http://${serverIp}:9090`;
+export const UPLOAD_BASE_URL = `https://${serverIp}:${serverPort}`;
