@@ -21,7 +21,7 @@
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column prop="titleType" label="题目类型" width="80px"></el-table-column>
-            <el-table-column prop="titleContent.scores" label="题目分数" width="50px"></el-table-column>
+            <el-table-column prop="titleContent.scores" label="题目分数" width="80px"></el-table-column>
             <el-table-column prop="titleCreateStamp" label="创建时间" width="120px"></el-table-column>
             <el-table-column prop="titleContent.name" label="题干"></el-table-column>
             <el-table-column prop="operate" label="操作">

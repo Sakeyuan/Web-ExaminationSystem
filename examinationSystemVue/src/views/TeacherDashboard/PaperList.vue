@@ -1,5 +1,5 @@
 <template>
-    <div v-if="tableData && tableData.length > 0">
+    <div>
         <div style="padding: 10px 0">
             <el-input style="width: 200px" placeholder="请输入试卷名称" suffix-icon="el-icon-search" class="mr-5"
                 v-model="paperName" @keyup.enter.native="handleSearch">
@@ -94,7 +94,6 @@
             </el-pagination>
         </div>
     </div>
-    <el-empty v-else description="看看是否可以发布试卷"></el-empty>
 </template>
 <script>
     import '@/styles/global.css';

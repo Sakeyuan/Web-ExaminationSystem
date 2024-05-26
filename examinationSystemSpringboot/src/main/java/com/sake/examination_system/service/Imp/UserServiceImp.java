@@ -3,6 +3,7 @@ package com.sake.examination_system.service.Imp;
 import cn.hutool.core.io.FileUtil;
 import com.auth0.jwt.JWT;
 import com.sake.examination_system.entity.DTO.EmailCodeDTO;
+import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.UserWithSTF;
 import com.sake.examination_system.entity.Student;
 import com.sake.examination_system.entity.Teacher;
@@ -68,10 +69,13 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public MyResponseEntity<List<Student>> getPage(int pageNum, int pageSize, int id, String userRealName) {
+    public MyResponseEntity<List<Student>> getPage(PageDTO pageDTO) {
         MyResponseEntity<List<Student>> r = new MyResponseEntity<List<Student>>();
-        pageNum = (pageNum - 1) * pageSize;
         List<Student> students = null;
+        int id = pageDTO.getId();
+        String userRealName = pageDTO.getName();
+        int pageNum = pageDTO.getPageNum();
+        int pageSize = pageDTO.getPageSize();
         if(id == 0){
             return null;
         }
@@ -100,7 +104,7 @@ public class UserServiceImp implements UserService {
                 student.getUser().setUserPassword(null); // 删除 userPassword 属性
                 student.getUser().setUserRole(-1);        // 设置 userRole 为默认值（或者您认为合适的其他值）
             }
-            r.setTotal(userMapper.getStudentsByUserRealNameTotal(userRealName,classIds));
+            r.setTotal(students.size());
         }
         r.ok();
         r.setData(students);

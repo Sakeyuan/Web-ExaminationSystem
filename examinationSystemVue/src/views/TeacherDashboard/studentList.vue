@@ -138,7 +138,7 @@
                     pageNum: this.pageNum,
                     pageSize: this.pageSize,
                     id: localStorage.getItem("id"),
-                    userRealName: this.userRealName,
+                    name: this.userRealName,
                 }
                 this.$api.studentObj.getAllStudentInfoPage(data).then(res => {
                     this.tableData = res.data;

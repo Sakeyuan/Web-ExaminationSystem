@@ -28,6 +28,10 @@
         WHERE student_id = #{studentId} AND paper_id = #{paperId}
     </update>
 
+    <delete id="removePaperByStudentId">
+        DELETE FROM student_paper WHERE student_id = #{studentId}
+    </delete>
+
     <select id="getPaperIdByStudent" resultType="java.lang.Integer">
         SELECT paper_id FROM student_paper
         WHERE student_id = #{id} AND is_finish = #{isFinish}
@@ -106,7 +110,7 @@
     <select id="getClassScoreAvg" resultType="java.lang.Integer">
         SELECT AVG(scores) AS average_score
         FROM student_paper
-        WHERE student_id IN
+        WHERE paper_id = #{paperId} AND student_id IN
         <foreach collection="studentIdList" item="studentId" open="(" separator="," close=")">
             #{studentId}
         </foreach>

@@ -4,7 +4,7 @@ const CLASS_STR = '/class';
 
 const classObj = {
     getAllClassByIdPage(params) {
-        return http.get(`${CLASS_STR}/getAllClassByIdPage`, params);
+        return http.post(`${CLASS_STR}/getAllClassByIdPage`, params);
     },
     removeClass(params) {
         return http.delete(`${CLASS_STR}/removeClass/` + params);

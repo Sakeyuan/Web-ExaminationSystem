@@ -2,6 +2,7 @@ package com.sake.examination_system.controller;
 
 import com.sake.examination_system.entity.Class;
 import com.sake.examination_system.entity.DTO.ClassDTO;
+import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.service.ClassService;
 import com.sake.examination_system.util.MyResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,9 @@ public class ClassController {
     @Resource
     ClassService classService;
 
-    @GetMapping("/getAllClassByIdPage")
-    public MyResponseEntity<List<Class>> getAllClassByIdPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam(required = false) String className, @RequestParam int id){
-        return classService.getAllClassByIdPage(pageNum,pageSize,className,id);
+    @PostMapping("/getAllClassByIdPage")
+    public MyResponseEntity<List<Class>> getAllClassByIdPage(@RequestBody PageDTO pageDTO){
+        return classService.getAllClassByIdPage(pageDTO);
     }
 
     @DeleteMapping("/removeClass/{classId}")

@@ -4,6 +4,7 @@ import com.sake.examination_system.entity.Student;
 import com.sake.examination_system.exception.ServiceException;
 import com.sake.examination_system.mapper.ClassMapper;
 import com.sake.examination_system.mapper.StudentMapper;
+import com.sake.examination_system.mapper.StudentPaperMapper;
 import com.sake.examination_system.mapper.UserMapper;
 import com.sake.examination_system.service.StudentService;
 import com.sake.examination_system.util.CodeNums;
@@ -21,7 +22,7 @@ public class StudentServiceImp implements StudentService {
     private StudentMapper studentMapper;
 
     @Resource
-    private ClassMapper classMapper;
+    private StudentPaperMapper studentPaperMapper;
 
     @Resource
     UserMapper userMapper;
@@ -87,8 +88,10 @@ public class StudentServiceImp implements StudentService {
         return studentMapper.getStudentsByUserRealName(pageNum,pageSize,userRealName,classIds);
     }
 
+    @Transactional
     @Override
     public MyResponseEntity<Object> removeStudentFromClass(int studentId) {
+        studentPaperMapper.removePaperByStudentId(studentId);
         return studentMapper.removeStudentFromClass(studentId) > 0 ? new MyResponseEntity<Object>(CodeNums.SUCCESS,"移出成功"): new MyResponseEntity<Object>(CodeNums.ERROR,"移出失败");
     }
 

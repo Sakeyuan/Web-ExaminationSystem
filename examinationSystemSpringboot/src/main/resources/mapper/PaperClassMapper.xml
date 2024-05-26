@@ -21,8 +21,13 @@
         GROUP BY
             c.class_id;
     </select>
+
     <select id="getClassIds" resultType="java.lang.Integer">
         SELECT class_id FROM  paper_class
         WHERE paper_id = #{paperId}
+    </select>
+
+    <select id="getPaperIdsByClassId" resultType="java.lang.Integer">
+        SELECT paper_id FROM paper_class WHERE class_id = #{classId}
     </select>
 </mapper>

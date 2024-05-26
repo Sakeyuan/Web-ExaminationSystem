@@ -11,6 +11,8 @@ import com.sake.examination_system.util.CodeNums;
 import com.sake.examination_system.util.MyResponseEntity;
 import com.sake.examination_system.util.SakeUtil;
 import io.swagger.models.auth.In;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -381,7 +383,7 @@ public class PaperServiceImp implements PaperService {
 
     @Override
     public MyResponseEntity<Object> addPaperClass(PaperAddClassDTO paperAddClassDTO) {
-        try{
+        try {
             List<Integer> classIds = classMapper.getIdSByClassName(paperAddClassDTO.getClassList());
             StudentPaper studentPaper = new StudentPaper();
             int paperId = paperAddClassDTO.getPaperId();
@@ -395,10 +397,15 @@ public class PaperServiceImp implements PaperService {
                 }
             }
             return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
-        }catch (Exception e){
-            throw new ServiceException(CodeNums.ERROR,e.getMessage());
+        } catch (DuplicateKeyException e) {
+            // 处理数据库唯一约束异常
+            return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
+        } catch (Exception e) {
+            // 处理其他异常
+            return new MyResponseEntity<>(CodeNums.ERROR, "Internal server error: " + e.getMessage());
         }
     }
+
 
     @Override
     public MyResponseEntity<Object> favorite(ExamRecords examRecords) {

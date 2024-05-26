@@ -253,7 +253,7 @@ public class SakeUtil {
     public static String getToken(int id,String sign){
         return JWT.create()
                 .withAudience(String.valueOf(id))  //将userId作为载荷
-                .withExpiresAt(DateUtil.offsetMinute(new Date(),5)) //12小时后到期
+                .withExpiresAt(DateUtil.offsetHour(new Date(),12)) //12小时后到期
                 .sign(Algorithm.HMAC256(sign));  //sign作为密钥
     }
 

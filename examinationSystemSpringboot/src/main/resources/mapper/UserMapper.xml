@@ -22,7 +22,10 @@
         SELECT COUNT(*)
         FROM student s
         INNER JOIN user u ON s.user_id = u.user_id
-        WHERE u.user_realName LIKE CONCAT('%',#{userRealName},'%') AND class_id = #{classId}
+        WHERE u.user_realName LIKE CONCAT('%',#{userRealName},'%') AND class_id IN
+        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
     </select>
 
     <select id="checkPhoneIsExist" resultType="java.lang.Integer">

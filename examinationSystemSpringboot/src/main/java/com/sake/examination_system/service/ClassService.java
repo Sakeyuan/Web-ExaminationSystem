@@ -2,6 +2,7 @@ package com.sake.examination_system.service;
 
 import com.sake.examination_system.entity.Class;
 import com.sake.examination_system.entity.DTO.ClassDTO;
+import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.util.MyResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface ClassService {
 
-    MyResponseEntity<List<Class>> getAllClassByIdPage(int pageNum, int pageSize, String className, int id);
+    MyResponseEntity<List<Class>> getAllClassByIdPage(PageDTO pageDTO);
 
     MyResponseEntity<Object> removeClass(int classId);
 

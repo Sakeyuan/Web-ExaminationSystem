@@ -46,4 +46,6 @@ public interface StudentMapper {
     List<Integer> getIdByClassId(int classId);
 
     List<Integer> getIdByClassIds(List<Integer> classIds);
+
+    Integer getIdByStudentNumber(String studentNumber);
 }

@@ -4,7 +4,7 @@ const STUDENT_STR = '/student'
 
 const studentObj = {
     getAllStudentInfoPage(params) {
-        return http.get(`${STUDENT_STR}/page`, params)
+        return http.post(`${STUDENT_STR}/page`, params)
     },
     removeStudentFromClass(params) {
         return http.delete(`${STUDENT_STR}/removeStudentFromClass/` + params)

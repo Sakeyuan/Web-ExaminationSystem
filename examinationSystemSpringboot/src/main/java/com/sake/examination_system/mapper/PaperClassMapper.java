@@ -12,4 +12,6 @@ public interface PaperClassMapper {
     List<HashMap<String, Integer>> getListByTeacherId(int teacherId);
 
     List<Integer> getClassIds(int paperId);
+
+    List<Integer> getPaperIdsByClassId(Integer classId);
 }

@@ -16,10 +16,7 @@
     <select id="getPage" resultType="com.sake.examination_system.entity.Class">
         SELECT *
         FROM class c
-        WHERE c.class_id IN
-        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
-            #{classId}
-        </foreach>
+        WHERE teacher_id = #{teacherId}
         LIMIT #{pageNum}, #{pageSize}
     </select>
 
@@ -35,10 +32,7 @@
     <select id="getClassByName" resultType="com.sake.examination_system.entity.Class">
         SELECT *
         FROM class c
-        WHERE c.class_name LIKE #{className} AND c.class_id IN
-        <foreach collection="classIds" item="classId" open="(" separator="," close=")">
-            #{classId}
-        </foreach>
+        WHERE c.class_name LIKE #{className} AND teacher_id = #{teacherId}
         LIMIT #{pageNum}, #{pageSize}
     </select>
 
@@ -93,6 +87,18 @@
         SELECT teacher_id FROM class
         WHERE class_id = #{classId}
     </select>
+
+    <select id="getCountsTotalById" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM class WHERE teacher_id = #{teacherId}
+    </select>
+
+    <select id="getCountsClassByName" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM class
+        WHERE teacher_id = #{teacherId}
+        AND class_name LIKE #{className}
+    </select>
+
 
 
 </mapper>

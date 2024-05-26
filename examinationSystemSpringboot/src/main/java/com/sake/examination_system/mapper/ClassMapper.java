@@ -9,11 +9,13 @@ import java.util.List;
 @Mapper
 public interface ClassMapper {
     List<Integer> getClassIdByTeacherId(int teacherId);
-    List<Class>  getPage(int pageNum,int pageSize, List<Integer>classIds);
+    List<Class>  getPage(int pageNum,int pageSize,int teacherId);
 
     Integer getAllClassTotalById(List<Integer> classIds);
 
-    List<Class> getClassByName(int pageNum, int pageSize, String className, List<Integer> classIds);
+    Integer getCountsTotalById(int teacherId);
+
+    List<Class> getClassByName(int pageNum, int pageSize, String className, int teacherId);
 
     int removeClass(int classId);
 
@@ -34,4 +36,6 @@ public interface ClassMapper {
     List<Integer> getClassIdListByTid(int teacherId);
 
     Integer getTeacherIdById(Integer classId);
+
+    Integer getCountsClassByName(String className, int teacherId);
 }

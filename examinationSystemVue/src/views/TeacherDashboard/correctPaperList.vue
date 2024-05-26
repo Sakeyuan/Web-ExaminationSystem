@@ -1,5 +1,5 @@
 <template>
-    <div v-if="tableData && tableData.length> 0">
+    <div>
         <div style="padding: 10px 0">
             <el-select v-model="className" placeholder="班级" class="mr-5">
                 <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item.value">
@@ -48,7 +48,6 @@
             </el-pagination>
         </div>
     </div>
-    <el-empty v-else description="(＾－＾) 没有试卷批改"></el-empty>
 </template>
 <script>
     import '@/styles/global.css';

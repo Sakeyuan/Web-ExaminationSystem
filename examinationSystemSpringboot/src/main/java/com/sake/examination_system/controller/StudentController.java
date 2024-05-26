@@ -1,4 +1,5 @@
 package com.sake.examination_system.controller;
+import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.Student;
 import com.sake.examination_system.service.Imp.StudentServiceImp;
 import com.sake.examination_system.service.StudentService;
@@ -26,9 +27,9 @@ public class StudentController {
     //分页查询
     //(pageNum - 1) * pageSize数据从哪个下标开始获取，获取多少条数据
     //select * from user limit (pageNum -1) * pageSize,pageSize
-    @GetMapping("/page")
-    public MyResponseEntity<List<Student>> getPage(@RequestParam int pageNum, @RequestParam int pageSize, @RequestParam int id, @RequestParam(required = false) String userRealName){
-        return userService.getPage(pageNum,pageSize,id,userRealName);
+    @PostMapping("/page")
+    public MyResponseEntity<List<Student>> getPage(@RequestBody  PageDTO pageDTO){
+        return userService.getPage(pageDTO);
     }
 
     @PostMapping("/addStudent")

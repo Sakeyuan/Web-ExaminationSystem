@@ -1,6 +1,7 @@
 package com.sake.examination_system.service;
 
 import com.sake.examination_system.entity.DTO.EmailCodeDTO;
+import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.Student;
 import com.sake.examination_system.entity.User;
 import com.sake.examination_system.util.MyResponseEntity;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface UserService {
     MyResponseEntity<Integer> addUser(User user);
-    MyResponseEntity<List<Student>> getPage(int pageNum, int pageSize, int id, String userRealName);
+    MyResponseEntity<List<Student>> getPage(PageDTO pageDTO);
     MyResponseEntity<Object> getPersonalInfo(HttpServletRequest request);
     User getUserById(int userId);
 

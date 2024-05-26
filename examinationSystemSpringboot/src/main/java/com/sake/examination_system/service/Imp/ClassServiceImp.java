@@ -3,10 +3,11 @@ package com.sake.examination_system.service.Imp;
 import com.sake.examination_system.entity.Class;
 import com.sake.examination_system.entity.DTO.ClassDTO;
 import com.sake.examination_system.entity.DTO.ClassWithT;
+import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.DTO.UserDTO;
-import com.sake.examination_system.mapper.ClassMapper;
-import com.sake.examination_system.mapper.StudentMapper;
-import com.sake.examination_system.mapper.TeacherMapper;
+import com.sake.examination_system.entity.PaperClass;
+import com.sake.examination_system.entity.StudentPaper;
+import com.sake.examination_system.mapper.*;
 import com.sake.examination_system.service.ClassService;
 import com.sake.examination_system.util.CodeNums;
 import com.sake.examination_system.util.MyResponseEntity;
@@ -31,29 +32,35 @@ public class ClassServiceImp implements ClassService {
     @Resource
     StudentMapper studentMapper;
 
+    @Resource
+    PaperClassMapper paperClassMapper;
+
+    @Resource
+    StudentPaperMapper studentPaperMapper;
+
     @Override
-    public MyResponseEntity<List<Class>> getAllClassByIdPage(int pageNum, int pageSize, String className, int id) {
+    public MyResponseEntity<List<Class>> getAllClassByIdPage(PageDTO pageDTO) {
         MyResponseEntity<List<Class>> r = new MyResponseEntity<List<Class>>();
-        pageNum = (pageNum - 1) * pageSize;
+        int pageNum = pageDTO.getPageNum();
+        int pageSize = pageDTO.getPageSize();
+        int teacherId = pageDTO.getId();
+        String className = pageDTO.getClassName();
         List<Class> myClass = null;
-        if(id == 0){
+        if(teacherId == 0){
             return null;
         }
-        List<Integer> classIds= classMapper.getClassIdByTeacherId(id);
-        if(classIds.isEmpty()){
-            return  null;
-        }
         if (className.isEmpty()) {
-            myClass = classMapper.getPage(pageNum,pageSize,classIds);
+            myClass = classMapper.getPage(pageNum,pageSize,teacherId);
+            r.setTotal(classMapper.getCountsTotalById(teacherId));
         }
         else{  //按照名称查询学生信息
             className = "%" + className + "%";
-            myClass = classMapper.getClassByName(pageNum,pageSize,className,classIds);
+            myClass = classMapper.getClassByName(pageNum,pageSize,className,teacherId);
+            r.setTotal(classMapper.getCountsClassByName(className,teacherId));
         }
         if(myClass.isEmpty()){
             return  null;
         }
-        r.setTotal(classMapper.getAllClassTotalById(classIds));
         r.ok();
         r.setData(myClass);
         return r;
@@ -141,13 +148,23 @@ public class ClassServiceImp implements ClassService {
         if(classId == null){
             return new MyResponseEntity<>(CodeNums.ERROR,"加入失败，班级不存在");
         }
-        studentMapper.addClass(SakeUtil.parseAuthorization(request),classId);
+        int userId = SakeUtil.parseAuthorization(request);
+        int studentId = studentMapper.getStudentByUserId(userId).getStudentId();
+        List<Integer> paperIds = paperClassMapper.getPaperIdsByClassId(classId);
+        for (Integer paperId : paperIds){
+            studentPaperMapper.addPaper(new StudentPaper(paperId,studentId));
+        }
+        studentMapper.addClass(userId,classId);
         return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
     }
 
+    @Transactional
     @Override
     public MyResponseEntity<Object> bowOutClass(HttpServletRequest request) {
-        studentMapper.bowOutClass(SakeUtil.parseAuthorization(request));
+        int userId = SakeUtil.parseAuthorization(request);
+        studentMapper.bowOutClass(userId);
+        int studentId = studentMapper.getStudentByUserId(userId).getStudentId();
+        studentPaperMapper.removePaperByStudentId(studentId);
         return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS");
     }
 

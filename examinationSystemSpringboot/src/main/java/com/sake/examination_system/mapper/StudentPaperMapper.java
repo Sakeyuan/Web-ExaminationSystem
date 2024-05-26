@@ -29,7 +29,9 @@ public interface StudentPaperMapper {
 
     Boolean getPaperIsFinish(int studentId, int paperId);
 
-    Integer getClassScoreAvg(List<Integer> studentIdList);
+    Integer getClassScoreAvg(List<Integer> studentIdList,int paperId);
 
     void updateSpendTime(int paperId, int studentId, Long spendTime);
+
+    void removePaperByStudentId(int studentId);
 }

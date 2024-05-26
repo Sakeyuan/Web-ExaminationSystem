@@ -6,6 +6,7 @@ import com.sake.examination_system.entity.DTO.InviteDTO;
 import com.sake.examination_system.entity.DTO.PageDTO;
 import com.sake.examination_system.entity.DTO.SingleInviteDTO;
 import com.sake.examination_system.entity.Student;
+import com.sake.examination_system.entity.StudentPaper;
 import com.sake.examination_system.entity.Teacher;
 import com.sake.examination_system.exception.ServiceException;
 import com.sake.examination_system.mapper.*;
@@ -52,6 +53,9 @@ public class TeacherServiceImp implements TeacherService {
 
     @Resource
     PaperClassMapper paperClassMapper;
+
+    @Resource
+    StudentPaperMapper studentPaperMapper;
 
     @Override
     public MyResponseEntity<Object> importStudent(MultipartFile file) throws IOException {
@@ -108,8 +112,13 @@ public class TeacherServiceImp implements TeacherService {
                 String name = parts[0];
                 String number = parts[1];
                 Integer hadClass =  studentMapper.getClassIdByNumber(number);
-                if(hadClass != null && hadClass != 0){
+                Integer studentId = studentMapper.getIdByStudentNumber(number);
+                if(hadClass == null && studentId != null){
                     int res = studentMapper.inviteStudentToClass(classId,number);
+                    List<Integer> paperIds = paperClassMapper.getPaperIdsByClassId(classId);
+                    for (Integer paperId : paperIds){
+                        studentPaperMapper.addPaper(new StudentPaper(paperId,studentId));
+                    }
                     if(res == 0){
                         data.put(name,number);
                     }
@@ -128,6 +137,11 @@ public class TeacherServiceImp implements TeacherService {
         }
         if(studentMapper.inviteStudentToClass(classId,studentInfo.getStudentNumber()) == 0){
             return new MyResponseEntity<>(CodeNums.ERROR,"邀请失败，学生不存在");
+        }
+        int studentId = studentMapper.getIdByStudentNumber(studentInfo.getStudentNumber());
+        List<Integer> paperIds = paperClassMapper.getPaperIdsByClassId(classId);
+        for (Integer paperId : paperIds){
+            studentPaperMapper.addPaper(new StudentPaper(paperId,studentId));
         }
         return new MyResponseEntity<>(CodeNums.SUCCESS,"邀请成功");
     }

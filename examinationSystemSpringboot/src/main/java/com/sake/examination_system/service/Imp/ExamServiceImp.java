@@ -59,7 +59,6 @@ public class ExamServiceImp implements ExamService {
                 if (studentPaperMapper.getPaperIsFinish(studentId,paperId)) {
                     return new MyResponseEntity<>(CodeNums.ERROR, "重复提交");
                 }
-
                 examRecordsMapper.addStudentAnswer(studentId, paperId, titleId, answerString);
             }
             //计算考试花费时间
@@ -102,20 +101,29 @@ public class ExamServiceImp implements ExamService {
     @Override
     public MyResponseEntity<Object> getGradeDetail(int paperId) {
         List<Class> classList = classMapper.getClassByIds(paperClassMapper.getClassIds(paperId));
-        HashMap<String,Integer> data = new HashMap<>();
-        for (Class myClass : classList){
-            List<Integer>  studentIdList = studentMapper.getIdByClassId(myClass.getClassId());
-            if(studentIdList.isEmpty()){
-                return new MyResponseEntity<>(CodeNums.ERROR,"请批改学生试卷再查看",data);
+        HashMap<String, Integer> data = new HashMap<>();
+        for (Class myClass : classList) {
+            List<Integer> studentIdList = studentMapper.getIdByClassId(myClass.getClassId());
+            if (studentIdList.isEmpty()) {
+                System.out.println("Class " + myClass.getClassName() + " has no students.");
+                data.put(myClass.getClassName(), 0);
+                continue; // Continue to the next class
             }
-            Integer classScoreAvg =  studentPaperMapper.getClassScoreAvg(studentIdList);
-            if(classScoreAvg == null){
-                data.put(myClass.getClassName(),0);
-            }
-            else{
-                data.put(myClass.getClassName(),classScoreAvg);
+
+            Integer classScoreAvg = studentPaperMapper.getClassScoreAvg(studentIdList,paperId);
+            if (classScoreAvg == null) {
+                data.put(myClass.getClassName(), 0);
+            } else {
+                data.put(myClass.getClassName(), classScoreAvg);
             }
         }
-        return new MyResponseEntity<>(CodeNums.SUCCESS,"获取成功",data);
+
+        // If no classes have valid data, return an appropriate message
+        if (data.isEmpty()) {
+            return new MyResponseEntity<>(CodeNums.ERROR, "请批改学生试卷再查看", data);
+        }
+
+        return new MyResponseEntity<>(CodeNums.SUCCESS, "获取成功", data);
     }
+
 }
