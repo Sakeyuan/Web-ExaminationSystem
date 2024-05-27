@@ -571,6 +571,7 @@
                 });
                 this.$api.paperObj.releasePaper(this.paperData).then(res => {
                     if (res.code == 2000) {
+                        this.preReleaseDialogVisible = false;
                         this.$message.success("创建成功");
                     } else {
                         this.$message.error(res.message);

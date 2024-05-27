@@ -69,11 +69,9 @@ public class TeacherServiceImp implements TeacherService {
             Object number = numberData.get(i);
             Object name = nameData.get(i);
             if (number != null && name != null) {
-                // Convert Object to String
                 String numberString = number.toString();
                 String nameString = name.toString();
 
-                // Create a Map for student numbers and names
                 Map<String, String> studentData = new HashMap<>();
                 studentData.put("number", numberString);
                 studentData.put("name", nameString);
@@ -249,7 +247,6 @@ public class TeacherServiceImp implements TeacherService {
 
         // 创建 ExcelWriter
         ExcelWriter excelWriter = ExcelUtil.getWriter(true);
-
         // 设置表头别名
         excelWriter.addHeaderAlias("ID", "ID").setColumnWidth(1,10);
         excelWriter.addHeaderAlias("学号", "学号").setColumnWidth(2,20);

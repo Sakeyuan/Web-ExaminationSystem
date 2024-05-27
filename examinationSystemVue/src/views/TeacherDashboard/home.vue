@@ -114,7 +114,7 @@
                     },
                     series: [
                         {
-                            name: 'Access From',
+                            name: '数量',
                             type: 'pie',
                             radius: '60%',
                             data: data.map(item => ({

@@ -68,7 +68,7 @@
         <el-dialog title="批量删除试卷" :visible.sync="batchDialogVisible" width="30%">
             <span>是否批量删除试卷</span>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button @click="batchDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="batchDelById">确 定</el-button>
             </span>
         </el-dialog>
