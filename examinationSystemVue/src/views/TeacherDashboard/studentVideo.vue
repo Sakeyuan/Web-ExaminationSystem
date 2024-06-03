@@ -23,12 +23,18 @@
             this.videoContainer = this.$refs.videoContainer;
         },
         methods: {
-            getOnlineStudents() {
+            getOnlineStudents() { 
                 // 获取在线学生列表
                 this.$api.teacherObj.getOnlineStudents(localStorage.getItem("id")).then(res => {
                     if (res.code === 2000) {
-                        this.onlineStudentList = res.data.split(",");
-                        this.initWebSocket();
+                        if (this.onlineStudentList.length > 0) {
+                            this.onlineStudentList = res.data.split(",");
+                            this.initWebSocket();
+                        }
+                        else {
+                            this.$message.warning('当前没有学生在线考试');
+                            console.log("没有学生考试");
+                        }
                     }
                     else {
                         this.$message.error(res.message);
@@ -43,13 +49,12 @@
             },
             async handleSocketOpen() {
                 console.log('连接建立成功');
-                console.log("学生：" + this.onlineStudentList)
                 if (this.onlineStudentList && this.onlineStudentList.length > 0) {
                     for (const studentId of this.onlineStudentList) {
                         await this.invite(studentId);
                     }
                 } else {
-                    console.error('没有学生考试');
+                    console.log('没有学生考试');
                 }
             },
             invite(studentId) {

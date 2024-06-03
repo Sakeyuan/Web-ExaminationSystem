@@ -3,8 +3,7 @@ import axios from 'axios';
 import { Message } from 'element-ui';
 import store from '@/store';
 import api from '@/api';
-import { serverIp } from '../../public/config';
-import { serverPort } from '../../public/config';
+import { serverIp, serverPort } from '../../public/config';
 
 const instance = axios.create({
   baseURL: `https://${serverIp}:${serverPort}`,
@@ -31,27 +30,25 @@ instance.interceptors.request.use(
 // 响应拦截器
 instance.interceptors.response.use(
   async (response) => {
-    const { data, config } = response;
-    return data;
+    return response.data;
   },
   async (error) => {
-    console.log(error);
-    if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {
-      // 处理请求超时
+    const { response, config } = error;
+    if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
       handleTimeoutError();
       return Promise.reject(error);
-    }
-   else if (error.response && error.response.status && error.response.status === 4003) {
+    } else if (response && response.status === 4003) {
       // 令牌失效，尝试刷新令牌
-      await handleTokenRefresh(error);
-    } else if (error.response && error.response.status && (error.response.status === 4001 || error.response.status === 4002)) {
-      // 处理用户身份认证错误
+      return handleTokenRefresh(error);
+    } else if (response && (response.status === 4001 || response.status === 4002)) {
       handleUserAuthenticationError();
     } else {
-      // 其他错误，加入请求队列以便稍后重试
       return new Promise((resolve, reject) => {
-        addToQueue((token) => resolve(instance(error.config)));
-        setTimeout(() => reject(error), calculateRetryDelay());
+        addToQueue((token) => {
+          config.headers['Authorization'] = `Bearer ${token}`;
+          resolve(instance(config));
+        });
+        setTimeout(() => reject(error), 1000);
       });
     }
   }
@@ -74,18 +71,28 @@ async function handleTokenRefresh(error) {
         store.commit('setToken', token);
         store.commit('setRefreshToken', refreshToken);
 
+        //重新使用新的token发起请求
         retryRequest(token);
         clearQueue();
-
-        return instance(error.config);
+      } else {
+        handleUserAuthenticationError();
       }
-    } catch (error) {
-      console.error('刷新令牌时出错:', error);
+    } catch (refreshError) {
+      console.error('刷新令牌时出错:', refreshError);
       handleUserAuthenticationError();
-      return Promise.reject(error);
+      return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
     }
+  } else {
+    //如果请求成功，则将请求结果作为成功的值，通过调用 resolve 来完成 Promise。如果请求在一定时间内没有成功，则将请求失败的原因作为失败的值，通过调用 reject 来完成 Promise。
+    return new Promise((resolve, reject) => {
+      addToQueue((token) => {
+        error.config.headers['Authorization'] = `Bearer ${token}`;
+        resolve(instance(error.config));
+      });
+      setTimeout(() => reject(error), calculateRetryDelay());
+    });
   }
 }
 
@@ -108,17 +115,6 @@ function retryRequest(token) {
 // 清空请求队列
 function clearQueue() {
   requests = [];
-}
-
-// 计算重试间隔
-function calculateRetryDelay() {
-  const maxDelay = 3000;
-  const baseDelay = 500;
-
-  const retries = requests.length;
-  const delay = Math.min(baseDelay * Math.pow(2, retries), maxDelay);
-
-  return delay;
 }
 
 export default instance;

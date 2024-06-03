@@ -309,12 +309,14 @@
         formData.append('user', new Blob([JSON.stringify(user)], { type: 'application/json' }));
         this.$api.uploadObj.uploadPersonalInfo(formData).then(res => {
           if (res.code === 2000) {
-            if (res.other.data != null) {
+            if (res.other && res.other.data != null) {
               this.$store.commit('setAvatarData', res.other.data);
             }
             if (res.data != null) {
               this.$store.commit('setUserData', res.data);
             }
+            this.$message.success("修改成功");
+            this.box = false;
             window.location.reload();
           }
           else {
