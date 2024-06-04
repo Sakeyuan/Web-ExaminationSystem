@@ -123,8 +123,8 @@
                             this.$message.error(res.message);
                         }
                     }).catch(error => {
-                        console.error('Verification Error:', error); // 添加调试语句
-                        this.$message.error('验证出现错误，请查看控制台日志'); // 添加错误提示
+                        console.error('Verification Error:', error); 
+                        this.$message.error('验证出现错误，请查看控制台日志'); 
                     }).finally(() => {
                         loading.close();
                     });

@@ -77,23 +77,21 @@
             getCompetence() {
                 // 获取摄像头权限
                 const constraints = { audio: false, video: { width: this.videoWidth, height: this.videoHeight } };
-                navigator.mediaDevices.getUserMedia(constraints)
-                    .then(stream => {
-                        this.mediaStream = stream;
-                        const video = document.getElementById('videoCamera');
-                        if ('srcObject' in video) {
-                            video.srcObject = stream;
-                        } else {
-                            video.src = window.URL.createObjectURL(stream);
-                        }
-                        video.onloadedmetadata = () => video.play();
-                    })
-                    .catch(err => {
-                        this.$message.warning('无法访问摄像头');
-                        console.error('无法访问摄像头:', err);
-                    });
+                navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+                    this.mediaStream = stream;
+                    const video = document.getElementById('videoCamera');
+                    if ('srcObject' in video) {
+                        video.srcObject = stream;
+                    } else {
+                        video.src = window.URL.createObjectURL(stream);
+                    }
+                    // 视频元数据加载完成后播放
+                    video.onloadedmetadata = () => video.play();
+                }).catch(err => {
+                    this.$message.warning('无法访问摄像头');
+                    console.error('无法访问摄像头:', err);
+                });
             },
-
             setImage() {
                 if (!this.mediaStream) {
                     this.$message.warning('请先打开摄像头');

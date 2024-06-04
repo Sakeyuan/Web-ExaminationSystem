@@ -336,7 +336,7 @@
                 console.error('WebSocket connection error:', e);
             },
             handleIceCandidateError(event) {
-                console.error("Error generating ICE candidate:", event.error); // 记录ICE candidate生成错误
+                console.error("Error generating ICE candidate:", event.error);
             },
             sendMessage(message) {
                 if (this.socketVideo && this.socketVideo.readyState === WebSocket.OPEN) {
@@ -361,7 +361,6 @@
                 this.conn.onicecandidateerror = this.handleIceCandidateError;
             },
             initWebSocket() {
-                // 建立WebSocket连接（文本数据）
                 this.socketText = new WebSocket(this.websocketUrl + "websocketSendText/" + localStorage.getItem("userId"));
                 this.socketText.onopen = this.webSocketOnopenText;
                 this.socketText.onmessage = this.webSocketOnmessageText;

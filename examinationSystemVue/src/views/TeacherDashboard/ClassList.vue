@@ -211,8 +211,8 @@
             inviteStudentByNumber() {
                 if (this.form.studentNumber == '') {
                     this.$message({
-                        message: "请输入学生学号", // 消息内容
-                        type: 'error'       // 消息类型，比如 'success', 'warning', 'info', 'error'
+                        message: "请输入学生学号", 
+                        type: 'error'       
                     });
                     return;
                 }
@@ -260,7 +260,7 @@
                 done();
             },
             openCreateClassDialog() {
-                this.createClassDialogVisible = true; // 打开对话框
+                this.createClassDialogVisible = true; 
             },
             exp() {
                 window.open(this.uploadUrl + "/teacher/exportStudentInfo")
