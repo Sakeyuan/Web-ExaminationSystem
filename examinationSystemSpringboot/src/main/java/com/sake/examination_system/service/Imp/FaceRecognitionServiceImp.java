@@ -124,17 +124,17 @@ public class FaceRecognitionServiceImp implements FaceRecognitionService {
     }
 
     @Override
-        public Boolean compareFaces(String img1, String img2) throws Exception {
-            String FaceMatchResultString = faceMatch(SakeUtil.imageToBase64(img1),SakeUtil.imageToBase64(img2));
-            Gson gson = new Gson();
-            FaceMatchResult res =  gson.fromJson(FaceMatchResultString, FaceMatchResult.class);
-            if(res.getError_code() == 110 || res.getError_code() == 111){
-                //token失效了
+    public Boolean compareFaces(String img1, String img2) throws Exception {
+        String FaceMatchResultString = faceMatch(SakeUtil.imageToBase64(img1),SakeUtil.imageToBase64(img2));
+        Gson gson = new Gson();
+        FaceMatchResult res =  gson.fromJson(FaceMatchResultString, FaceMatchResult.class);
+        if(res.getError_code() == 110 || res.getError_code() == 111){
+            //token失效了
 
-                compareFaces(img1,img2);
-            }
-            return res.getResult().getScore() > 80;
+            compareFaces(img1,img2);
         }
+        return res.getResult().getScore() > 80;
+    }
 
     private byte[] readImageFile(String imagePath) throws IOException {
         File file = new File(imagePath);

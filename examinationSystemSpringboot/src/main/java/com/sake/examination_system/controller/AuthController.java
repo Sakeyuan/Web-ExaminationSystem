@@ -17,9 +17,6 @@ public class AuthController {
     @Resource
     AuthService authService;
 
-    @PostMapping("/checkToken")
-    public void checkToken() {
-    }
 
     @PostMapping("/refreshToken")
     public MyResponseEntity<String> refreshToken(HttpServletRequest request, HttpServletResponse response, @RequestBody String refreshToken){

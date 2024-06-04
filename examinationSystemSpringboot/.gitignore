@@ -18,6 +18,8 @@ target/
 *.iws
 *.iml
 *.ipr
+**/src/main/resources/static/files/faces
+**/src/main/resources/static/files/avatars
 
 ### NetBeans ###
 /nbproject/private/

@@ -107,7 +107,6 @@ public class WebSocketVideoStudent {
         }
     }
 
-
     @OnError
     public void onError(Session session, Throwable error) {
         error.printStackTrace();

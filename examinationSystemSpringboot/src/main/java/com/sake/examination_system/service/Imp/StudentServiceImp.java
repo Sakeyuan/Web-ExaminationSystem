@@ -9,6 +9,7 @@ import com.sake.examination_system.mapper.UserMapper;
 import com.sake.examination_system.service.StudentService;
 import com.sake.examination_system.util.CodeNums;
 import com.sake.examination_system.util.MyResponseEntity;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +60,11 @@ public class StudentServiceImp implements StudentService {
             else{
                 r.error();
             }
-        }catch (Exception e) {
+        }catch (DuplicateKeyException e) {
+            // 处理唯一约束冲突的逻辑
+            r.setCode(CodeNums.ERROR);
+            r.setMessage("学生学号已存在，请检查输入。");
+        } catch (Exception e) {
             throw new ServiceException(CodeNums.ERROR,"用户信息为空");
         }
         return r;

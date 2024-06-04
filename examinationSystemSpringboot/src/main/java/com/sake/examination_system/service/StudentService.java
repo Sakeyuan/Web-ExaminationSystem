@@ -17,7 +17,5 @@ public interface StudentService {
     Student getStudentByUserId(int userId);
 
     List<Integer> getStudentIds(List<Integer> classIds);
-
-
     Integer getClassIdById(Integer studentId);
 }

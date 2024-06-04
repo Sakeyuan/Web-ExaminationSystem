@@ -53,6 +53,4 @@ public class TeacherController {
     public MyResponseEntity<Object>getOnlineStudents(@PathVariable("id") String id ){
         return teacherService.getOnlineStudents(id);
     }
-
-
 }

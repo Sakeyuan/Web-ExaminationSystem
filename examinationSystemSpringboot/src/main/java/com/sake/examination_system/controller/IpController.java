@@ -22,5 +22,4 @@ public class IpController {
     public String getClientIpByString(@PathVariable("ip") String ip) {
         return SakeUtil.getClientIpByString(ip);
     }
-
 }

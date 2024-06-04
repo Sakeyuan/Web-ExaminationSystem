@@ -220,15 +220,20 @@ public class FileUploadServiceImp implements FileUploadService {
     @Transactional
     @Override
     public MyResponseEntity<Object> handlePersonalInfo(MultipartFile file, User user,HttpServletRequest request) throws Exception {
-        int userAvatarId = 0;
-        if (file != null && !file.isEmpty()) {
-            userAvatarId = userService.uploadAvatar(file);
+        try{
+            int userAvatarId = 0;
+            if (file != null && !file.isEmpty()) {
+                userAvatarId = userService.uploadAvatar(file);
+            }
+            if(userAvatarId != 0){
+                user.setUserAvatarId(userAvatarId);
+            }
+            userService.updateUserInfo(user);
+            return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS",0,userService.getPersonalInfo(request).getData(),getAvatarByToken(request));
+        }catch (ServiceException se) {
+            // 处理获取头像时的异常
+            return new MyResponseEntity<>(CodeNums.SUCCESS, se.getMessage(), null);
         }
-        if(userAvatarId != 0){
-            user.setUserAvatarId(userAvatarId);
-        }
-        userService.updateUserInfo(user);
-        return new MyResponseEntity<>(CodeNums.SUCCESS,"SUCCESS",0,userService.getPersonalInfo(request).getData(),getAvatarByToken(request));
     }
 
     @Override

@@ -22,5 +22,4 @@ public class RegisterController {
     public MyResponseEntity<Object> teacherRegister(@RequestBody RegisterDTO registerDTO){
         return registerService.teacherRegister(registerDTO);
     }
-
 }

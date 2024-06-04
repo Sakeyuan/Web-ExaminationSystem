@@ -58,27 +58,31 @@ public class TeacherServiceImp implements TeacherService {
     StudentPaperMapper studentPaperMapper;
 
     @Override
-    public MyResponseEntity<Object> importStudent(MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        ExcelReader excelReader = ExcelUtil.getReader(inputStream);
-        List<Object> numberData = excelReader.readColumn(1, 1);
-        List<Object> nameData = excelReader.readColumn(0, 1);
-        List<Map<String,String >> studentNumbers = new ArrayList<>();
+    public MyResponseEntity<Object> importStudent(MultipartFile file) {
+        try{
+            InputStream inputStream = file.getInputStream();
+            ExcelReader excelReader = ExcelUtil.getReader(inputStream);
+            List<Object> numberData = excelReader.readColumn(1, 1);
+            List<Object> nameData = excelReader.readColumn(0, 1);
+            List<Map<String,String >> studentNumbers = new ArrayList<>();
 
-        for (int i = 0; i < numberData.size(); ++i) {
-            Object number = numberData.get(i);
-            Object name = nameData.get(i);
-            if (number != null && name != null) {
-                String numberString = number.toString();
-                String nameString = name.toString();
+            for (int i = 0; i < numberData.size(); ++i) {
+                Object number = numberData.get(i);
+                Object name = nameData.get(i);
+                if (number != null && name != null) {
+                    String numberString = number.toString();
+                    String nameString = name.toString();
 
-                Map<String, String> studentData = new HashMap<>();
-                studentData.put("number", numberString);
-                studentData.put("name", nameString);
-                studentNumbers.add(studentData);
+                    Map<String, String> studentData = new HashMap<>();
+                    studentData.put("number", numberString);
+                    studentData.put("name", nameString);
+                    studentNumbers.add(studentData);
+                }
             }
+            return new MyResponseEntity<>(CodeNums.SUCCESS,"解析成功",studentNumbers.size(),studentNumbers);
+        }catch (Exception e){
+            throw new ServiceException(CodeNums.ERROR,"表格解析错误，请检查模版是否正确");
         }
-        return new MyResponseEntity<>(CodeNums.SUCCESS,"解析成功",studentNumbers.size(),studentNumbers);
     }
 
     @Transactional
